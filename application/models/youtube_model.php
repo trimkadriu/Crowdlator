@@ -107,7 +107,7 @@ class Youtube_model extends CI_Model {
 
     function delete_youtube_video($video_id)
     {
-        //Get youtube video upload token 
+        //Get youtube video upload token
         $login_response = $this->do_login();
         //Load configuration variables
         $youtube_user_id = $this->config->item("youtube_user_id");
