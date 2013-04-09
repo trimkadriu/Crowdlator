@@ -80,7 +80,7 @@ $autoload['helper'] = array('url', 'form', 'user_functions');
 |
 */
 
-$autoload['config'] = array('youtube_config');
+$autoload['config'] = array('youtube_config', 'soundcloud_config');
 
 
 /*

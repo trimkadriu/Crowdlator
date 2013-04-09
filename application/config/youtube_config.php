@@ -12,8 +12,9 @@ $config['youtube_email'] = "trim.kadriu@gmail.com"; // Google account Username
 $config['youtube_password'] = "lladika001!!"; // Google account Password
 $config['youtube_user_id'] = "UCIRty4QD7NlxrxQdv-zcDpQ"; // Youtube account user id
 $config['youtube_source'] = "Crowdlator testing environment"; // A short string that identifies your application for logging purposes.
+// Google Developer Key
 $config['youtube_developer_key'] = "AI39si51BcMmO0DPlDRNHxLuhSkuDYnLKfg2-U_-132Sqd3zD1mGCOze7SGn_ItvFUKjfR0jnym-5gw-4UMDUG5BNmo2g9woiw";
-// IMPORTANT: Please set HTTP or HTTPS protocol. The redirect URL after a successful upload
+// IMPORTANT: Please include HTTP or HTTPS protocol in the redirect URL after a successful upload
 $config['youtube_next_url'] = "http://localhost/crowdlator/admin/projects/check_project";
 
 /*
