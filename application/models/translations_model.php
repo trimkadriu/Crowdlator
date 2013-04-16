@@ -75,11 +75,13 @@ class Translations_model extends CI_Model {
             return $query->result();
     }
 
-    function get_translations_by_task_ids($task_ids, $limit)
+    function get_translations_by_task_ids($task_ids, $limit, $reviewed = null)
     {
         $this->db->select('*');
         $this->db->from('translations');
         $this->db->where('`task_id` IN ('.implode(',',$task_ids).')');
+        if($reviewed != null)
+            $this->db->where('reviewed', $reviewed);
         $this->db->order_by('date_created', 'desc');
         if($limit)
             $this->db->limit($limit);
@@ -88,6 +90,23 @@ class Translations_model extends CI_Model {
             return false;
         else
             return $query->result();
+    }
+
+    function edit_translation_by_editor($translation_id, $edited_translation)
+    {
+        $this->db->trans_start();
+        $data = array(
+            'translated_text' => $edited_translation,
+            'reviewed' => '1'
+        );
+        $this->db->where('id', $translation_id);
+        $this->db->update('translations', $data);
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return $log;
     }
 
 }
