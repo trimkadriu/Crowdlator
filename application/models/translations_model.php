@@ -109,6 +109,21 @@ class Translations_model extends CI_Model {
             return $log;
     }
 
+    function set_reviewed($translation_id, $reviewed){
+        $this->db->trans_start();
+        $data = array(
+            'reviewed' => $reviewed
+        );
+        $this->db->where('id', $translation_id);
+        $this->db->update('translations', $data);
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return $log;
+    }
+
 }
 
 ?>

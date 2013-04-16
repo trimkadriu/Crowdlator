@@ -39,10 +39,10 @@
                 <td style="text-align: center">
                     <?php
                         if($reviewed[$i]){
-                            echo '<i class="icon-ok"></i>';
+                            echo '<span style="display: none">1</span><i class="icon-ok"></i>';
                         }
                         else{
-                            echo '<i class="icon-remove"></i>';
+                            echo '<span style="display: none">0</span><i class="icon-remove"></i>';
                         }
                     ?>
                 </td>
@@ -78,13 +78,14 @@
             <input style="display: none" id="submit_edit" type="submit" value="Save" class="btn btn-primary pull-right">
             <input type="hidden" name="translation_id" value=""/>
         </form>
+        <label>Reviewed: <input type="checkbox" id="reviewed" style="margin-top: -3px;"></label>
         <button class="btn btn-primary pull-right"
                 onclick="$('#submit_edit').show(); $('#translated').removeAttr('disabled'); $(this).remove();">
             Edit
         </button>
     </div>
     <div class="modal-footer">
-        <a class="btn" data-dismiss="modal">Close</a>
+        <a class="btn" data-dismiss="modal" onclick="document.location.reload(true);">Close</a>
     </div>
 </div>
 <script>
@@ -92,9 +93,22 @@
         $('#original').val(text);
         $('#translated').val(translated);
         $('input[name=translation_id]').val(translation_id);
+        $("#reviewed").attr("checked", "true");
+        change_reviewed(1, translation_id);
+    }
+
+    function change_reviewed(reviewed, id){
+        $.get("<?php echo base_url("admin/translate/set_reviewed?r="); ?>" + reviewed + "&id=" + id);
     }
     $(document).ready(function() {
         $("[rel=tooltip]").tooltip();
+
+        $("#reviewed").change(function (){
+            reviewed = $(this).prop("checked");
+            reviewed = +reviewed;
+            id = $("input[name=translation_id]").val();
+            change_reviewed(reviewed, id);
+        });
     });
 </script>
 <?php $this->load->view('_inc/datatables'); ?>
