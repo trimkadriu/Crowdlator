@@ -14,15 +14,15 @@
                        onclick="change_location('<?php echo base_url('public/translate/task'); ?>/' + $('#<?php echo $task_id; ?>').next().attr('id'))"/>
                 <div class="pull-right">
                     <span rel="tooltip" data-placement="top" data-original-title="Ask for translation by sharing it on Facebook.">
-                        <a href="#">
-                            <img src="<?php echo base_url(); ?>template/img/extra_icons/glyphicons_410_facebook.png"
-                                 style="width: 30px; height: 30px"/>
+                        <a href="#" onclick="facebook_share()">
+                            <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
+                                 style="width: 28px; height: 28px"/>
                         </a>
                     </span>
                     <span rel="tooltip" data-placement="top" data-original-title="Ask for translation by sharing it on Twitter.">
-                        <a href="#">
-                            <img src="<?php echo base_url(); ?>template/img/extra_icons/glyphicons_411_twitter.png"
-                                 style="width: 30px; height: 30px"/>
+                        <a href="#" onclick="twitter_share()">
+                            <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
+                                 style="width: 28px; height: 28px"/>
                         </a>
                     </span>
                     <span rel="tooltip" data-placement="top" data-original-title="You need to register in Crowdlator in order to save drafts.">
@@ -66,9 +66,19 @@
         $("[rel=tooltip]").tooltip();
     });
 
-    function change_location(url)
-    {
+    function change_location(url) {
         window.location = url;
+    }
+
+    function facebook_share() {
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href),
+                '', 'width=600,height=300');
+    }
+
+    function twitter_share() {
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute to translate this task ') +
+                encodeURIComponent(window.location.href),
+                '', 'width=600,height=300');
     }
 </script>
 <?php $this->load->view('_inc/footer'); ?>

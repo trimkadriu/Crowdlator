@@ -128,6 +128,7 @@ class Translate extends CI_Controller {
             redirect("/pages/permission_exception");
         $data['tasks'] = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
         $data['translations_nr'] = false;
+        $data['make_active'] = 1;
         if($data['tasks'])
         {
             $ids = array();
@@ -152,6 +153,8 @@ class Translate extends CI_Controller {
                         $data['translate_text'][$i] = $data['tasks'][$i]->text;
                         $data['translated_text'][$i] = $translations[$i]->translated_text;
                         $data['date_translated'][$i] = $translations[$i]->date_created;
+                        $data['translation_id'][$i] = $translations[$i]->id;
+                        $data['reviewed'][$i] = $translations[$i]->reviewed;
                     }
                 }
                 else
@@ -162,5 +165,91 @@ class Translate extends CI_Controller {
         $this->load->view("admin/translations/translations", $data);
     }
 
+    function translations_reviewed()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/translations'))
+            redirect("/pages/permission_exception");
+        $temp = func_get_args(0);
+        if($temp)
+            $reviewed = $temp[0];
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'Please specify if reviewed.');
+            redirect('admin/translate/translations');
+        }
+        if($reviewed == 1)
+            $data['make_active'] = 2;
+        if($reviewed == 0)
+            $data['make_active'] = 3;
+        $data['tasks'] = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
+        $data['translations_nr'] = false;
+        if($data['tasks'])
+        {
+            $ids = array();
+            for($i = 0; $i < sizeof($data['tasks']); $i++)
+            {
+                $ids[$i] = $data['tasks'][$i]->id;
+            }
+            if(sizeof($ids) > 0)
+            {
+                $translations = $this->translations_model->get_translations_by_task_ids($ids, false, $reviewed);
+                $data['translations_nr'] = sizeof($translations);
+                if($translations)
+                {
+                    for($i = 0; $i < $data['translations_nr']; $i++)
+                    {
+                        $temp = $this->projects_model->select_project_by_id($data['tasks'][$i]->project_id)->result();
+                        $projects[$i] = $temp[0];
+                        //$data['task_id'][$i] = $data['tasks'][$i]->id;
+                        $data['project_name'][$i] = $projects[$i]->project_name;
+                        $data['translate_from'][$i] = $projects[$i]->translate_from_language;
+                        $data['translate_to'][$i] = $projects[$i]->translate_to_language;
+                        $data['translate_text'][$i] = $data['tasks'][$i]->text;
+                        $data['translated_text'][$i] = $translations[$i]->translated_text;
+                        $data['date_translated'][$i] = $translations[$i]->date_created;
+                        $data['translation_id'][$i] = $translations[$i]->id;
+                        $data['reviewed'][$i] = $translations[$i]->reviewed;
+                    }
+                }
+                else
+                    $data['translations_nr'] = 0;
+            }
+
+        }
+        $this->load->view("admin/translations/translations", $data);
+    }
+
+    function editor_edit_translation(){
+        if(!check_permissions(get_session_roleid(), 'admin/translate/editor_edit_translation'))
+            redirect("/pages/permission_exception");
+        if($_POST)
+        {
+            // POST request
+            $translation_id = strip_tags($this->input->post("translation_id", TRUE));
+            if(strlen($translation_id) == 0)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'This task does not exist.');
+                redirect("admin/user/dashboard");
+            }
+            $translated_text = strip_tags($this->input->post("translated", TRUE));
+            $result = $this->translations_model->edit_translation_by_editor($translation_id, $translated_text);
+            if($result)
+            {
+                // Translation done
+                $this->session->set_flashdata('message_type', 'success');
+                $this->session->set_flashdata('message', 'You have edited and reviewed a task successfully.');
+                redirect("admin/translate/translations");
+            }
+            else
+            {
+                // Translation creation ERROR
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Error editing task. Error: '.$result);
+                redirect("admin/translate/translations");
+            }
+        }
+    }
 }
 ?>
