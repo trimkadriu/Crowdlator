@@ -220,7 +220,8 @@ class Translate extends CI_Controller {
         $this->load->view("admin/translations/translations", $data);
     }
 
-    function editor_edit_translation(){
+    function editor_edit_translation()
+    {
         if(!check_permissions(get_session_roleid(), 'admin/translate/editor_edit_translation'))
             redirect("/pages/permission_exception");
         if($_POST)
@@ -249,6 +250,20 @@ class Translate extends CI_Controller {
                 $this->session->set_flashdata('message', 'Error editing task. Error: '.$result);
                 redirect("admin/translate/translations");
             }
+        }
+    }
+
+    function set_reviewed()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/set_reviewed'))
+            redirect("/pages/permission_exception");
+        $get_r = $this->input->get('r', true);
+        $get_id = $this->input->get('id', true);
+        if(isset($get_r) && isset($get_id))
+        {
+            $reviewed = strip_tags($get_r);
+            $id = strip_tags($get_id);
+            $this->translations_model->set_reviewed($id, $reviewed);
         }
     }
 }

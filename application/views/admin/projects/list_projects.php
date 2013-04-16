@@ -43,6 +43,10 @@
                             <a href="<?php echo base_url('admin/projects/tasks_list/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="List project tasks">
                             <i class="icon-th-list"></i></a>
                         <?php } ?>
+                        <a onclick="prepare_video_modal('<?php echo $project->video_id; ?>', '<?php echo $project->project_name; ?>');"
+                           href="#video_modal" rel="tooltip" data-placement="top" data-original-title="Open video of this project."
+                           data-toggle="modal">
+                            <i class="icon-film"></i></a>
                     </td>
                 </tr>
                 <?php $index++; } } else {?>
@@ -50,6 +54,19 @@
                 <?php } ?>
             </tbody>
         </table>
+    </div>
+</div>
+<div class="modal hide fade" id="video_modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="video_modal_title"></h3>
+    </div>
+    <div class="modal-body">
+        <!-- Youtube Video Here -->
+        <iframe id="video" width="530" height="298" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div class="modal-footer">
+        <a class="btn" data-dismiss="modal">Close</a>
     </div>
 </div>
 <?php if(check_permissions(get_session_roleid(), 'admin/projects/delete_project')) { ?>
@@ -82,6 +99,11 @@
     $(document).ready(function() {
         $("[rel=tooltip]").tooltip();
     });
+
+    function prepare_video_modal(video_id, project_name) {
+        $("#video").attr("src", "http://www.youtube.com/embed/" + video_id);
+        $("#video_modal_title").text("Video of '" + project_name + "'");
+    }
 </script>
 <?php $this->load->view('_inc/datatables'); ?>
 <?php $this->load->view('_inc/footer_base'); ?>
