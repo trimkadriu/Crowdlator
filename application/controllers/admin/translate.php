@@ -35,6 +35,19 @@ class Translate extends CI_Controller {
                 $this->session->set_flashdata('message', 'This task does not exist.');
                 redirect("admin/user/dashboard");
             }
+            //reCaptcha Validation
+            $this->load->library("recaptcha");
+            $this->recaptcha->recaptcha_check_answer(
+                $_SERVER['REMOTE_ADDR'],
+                $this->input->post('recaptcha_challenge_field'),
+                $this->input->post('recaptcha_response_field')
+            );
+            if(!$this->recaptcha->is_valid)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                redirect("admin/translate/task_id/".$task_id);
+            }
             $translated_text = strip_tags($this->input->post("translated", TRUE));
             $temp = $this->tasks_model->get_task_by_id($task_id);
             $text = $temp[0]->text;
@@ -83,6 +96,7 @@ class Translate extends CI_Controller {
             $data['translate_to'] = $project->translate_to_language;
             $data['text'] = $task->text;
             $data['task_id'] = $task_id;
+            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
             $this->load->view("admin/projects/translate", $data);
         }
         else

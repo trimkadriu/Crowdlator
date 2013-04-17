@@ -1,18 +1,35 @@
 <?php
 
 class Public_model extends CI_Model {
+
+    function __construct()
+    {
+        $this->load->library("recaptcha");
+    }
 	
     function do_translate()
     {
         if($_POST)
         {
             // POST request
-            $task_id = $this->input->post("task_id", TRUE);
+            $task_id = strip_tags($this->input->post("task_id", TRUE));
             if(strlen($task_id) == 0)
             {
                 $this->session->set_flashdata('message_type', 'error');
                 $this->session->set_flashdata('message', 'This task does not exist.');
                 redirect(base_url());
+            }
+            //reCaptcha Validation
+            $this->recaptcha->recaptcha_check_answer(
+                $_SERVER['REMOTE_ADDR'],
+                $this->input->post('recaptcha_challenge_field'),
+                $this->input->post('recaptcha_response_field')
+            );
+            if(!$this->recaptcha->is_valid)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                redirect("public/translate/task/".$task_id);
             }
             $translated_text = strip_tags($this->input->post("translated", TRUE));
             $text = $this->tasks_model->get_task_by_id($task_id)[0]->text;
