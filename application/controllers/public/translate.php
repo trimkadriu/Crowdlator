@@ -33,10 +33,13 @@ class Translate extends CI_Controller {
             $data['project_name'] = $project->project_name;
             $data['translate_from'] = $project->translate_from_language;
             $data['translate_to'] = $project->translate_to_language;
+            $data['project_video_id'] = $project->video_id;
+            $data['project_description'] = $project->project_description;
             $data['text'] = $task->text;
             $data['task_id'] = $task_id;
             $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
 //            $data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
+            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
             $this->load->view("public/public_translate", $data);
         }
         else

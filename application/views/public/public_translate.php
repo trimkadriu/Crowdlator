@@ -10,21 +10,24 @@
                 <strong>Translate to <?php echo $translate_to; ?>:</strong><br/>
                 <textarea name="translated" style="width: 95%; height: 150px; margin-top: 5px; resize: none;"></textarea>
                 <input type="hidden" name="task_id" value="<?php echo $task_id; ?>"/>
+                <!-- reCaptcha CODE -->
+                <script type="text/javascript">
+                    var RecaptchaOptions = {theme : 'clean'};
+                </script>
+                <div style="margin-bottom: 15px;">
+                    <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $recaptcha_public_key; ?>">
+                    </script>
+                    <noscript>
+                        <iframe src="http://www.google.com/recaptcha/api/noscript?k=<?php echo $recaptcha_public_key; ?>"
+                                height="200" width="500" frameborder="0"></iframe><br>
+                        <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+                        <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+                    </noscript>
+                </div>
+                <!-- reCaptcha CODE -->
                 <input type="button" class="btn btn-danger" value="Skip"
-                       onclick="change_location('<?php echo base_url('public/translate/task'); ?>/' + $('#<?php echo $task_id; ?>').next().attr('id'))"/>
+                       onclick="change_location($('#<?php echo $task_id; ?>').next().attr('id'))"/>
                 <div class="pull-right">
-                    <span rel="tooltip" data-placement="top" data-original-title="Ask for translation by sharing it on Facebook.">
-                        <a href="#" onclick="facebook_share()">
-                            <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
-                                 style="width: 28px; height: 28px"/>
-                        </a>
-                    </span>
-                    <span rel="tooltip" data-placement="top" data-original-title="Ask for translation by sharing it on Twitter.">
-                        <a href="#" onclick="twitter_share()">
-                            <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
-                                 style="width: 28px; height: 28px"/>
-                        </a>
-                    </span>
                     <span rel="tooltip" data-placement="top" data-original-title="You need to register in Crowdlator in order to save drafts.">
                         <input type="button" class="btn btn-info" value="Save to draft" style="cursor: not-allowed;"/>
                     </span>
@@ -35,8 +38,29 @@
         </div>
         <div class="span6" style="text-align: center;">
             <div class="well">
-                <h3>Try other tasks of the same project:</h3>
-                <ul id="list" style="list-style: none;">
+                <h3 style="margin:0px">Video of this project</h3><hr style="margin: 0 0 10px 0"/>
+                <iframe width="420" height="236" src="http://www.youtube.com/embed/<?php echo $project_video_id; ?>" frameborder="0" allowfullscreen></iframe>
+                <p>
+                    <span style="text-decoration: underline; font-weight: bold">Description:</span>
+                    <?php echo $project_description; ?>
+                </p>
+                <p>
+                    <span style="text-decoration: underline; font-weight: bold; margin-bottom: 5px">Social Networks:</span>
+                </p>
+                <span rel="tooltip" data-placement="top" data-original-title="Ask for translation by sharing it on Facebook.">
+                    <a href="#" onclick="facebook_share()">
+                        <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
+                             style="width: 28px; height: 28px"/>
+                    </a>
+                </span>
+                <span rel="tooltip" data-placement="top" data-original-title="Ask for translation by sharing it on Twitter.">
+                    <a href="#" onclick="twitter_share()">
+                        <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
+                             style="width: 28px; height: 28px"/>
+                    </a>
+                </span>
+                <!--<h3>Try other tasks of the same project:</h3>-->
+                <ul id="list" style="display: none;">
                     <?php foreach($next_tasks as $next_task) { ?>
                     <li id="<?php echo $next_task->id ?>">
                         <a href="<?php echo base_url('public/translate/task/'.$next_task->id); ?>">
@@ -66,8 +90,12 @@
         $("[rel=tooltip]").tooltip();
     });
 
-    function change_location(url) {
-        window.location = url;
+    function change_location(id) {
+        url = "<?php echo base_url('public/translate/task'); ?>/";
+        if($('#' + id)[0])
+            window.location = url + id;
+        else
+            alert("There are no more tasks for this project");
     }
 
     function facebook_share() {

@@ -11,6 +11,21 @@
             <strong>Translate to <?php echo $translate_to; ?>:</strong><br/>
             <textarea name="translated" style="width: 100%; height: 150px; margin-top: 5px; resize: none;"></textarea>
             <input type="hidden" name="task_id" value="<?php echo $task_id; ?>"/>
+            <!-- reCaptcha CODE -->
+            <script type="text/javascript">
+                var RecaptchaOptions = {theme : 'clean'};
+            </script>
+            <div style="margin-bottom: 15px;">
+                <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $recaptcha_public_key; ?>">
+                </script>
+                <noscript>
+                    <iframe src="http://www.google.com/recaptcha/api/noscript?k=<?php echo $recaptcha_public_key; ?>"
+                            height="200" width="500" frameborder="0"></iframe><br>
+                    <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+                    <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+                </noscript>
+            </div>
+            <!-- reCaptcha CODE -->
             <input type="button" class="btn btn-danger" value="Cancel" onclick="history.back()"/>
             <div class="pull-right">
                 <input type="button" class="btn btn-info" value="Save to draft"/>
