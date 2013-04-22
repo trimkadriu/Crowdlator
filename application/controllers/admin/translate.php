@@ -158,17 +158,21 @@ class Translate extends CI_Controller {
                 {
                     for($i = 0; $i < $data['translations_nr']; $i++)
                     {
-                        $temp = $this->projects_model->select_project_by_id($data['tasks'][$i]->project_id)->result();
+                        $task_id = $translations[$i]->task_id;
+                        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+                        $project_id = $task->project_id;
+                        $temp = $this->projects_model->select_project_by_id($project_id)->result();
                         $projects[$i] = $temp[0];
                         //$data['task_id'][$i] = $data['tasks'][$i]->id;
                         $data['project_name'][$i] = $projects[$i]->project_name;
                         $data['translate_from'][$i] = $projects[$i]->translate_from_language;
                         $data['translate_to'][$i] = $projects[$i]->translate_to_language;
-                        $data['translate_text'][$i] = $data['tasks'][$i]->text;
+                        $data['translate_text'][$i] = $task->text; //$data['tasks'][$i]->text;
                         $data['translated_text'][$i] = $translations[$i]->translated_text;
                         $data['date_translated'][$i] = $translations[$i]->date_created;
                         $data['translation_id'][$i] = $translations[$i]->id;
                         $data['reviewed'][$i] = $translations[$i]->reviewed;
+                        $data['approved'][$i] = $translations[$i]->approved;
                     }
                 }
                 else
@@ -213,7 +217,10 @@ class Translate extends CI_Controller {
                 {
                     for($i = 0; $i < $data['translations_nr']; $i++)
                     {
-                        $temp = $this->projects_model->select_project_by_id($data['tasks'][$i]->project_id)->result();
+                        $task_id = $translations[$i]->task_id;
+                        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+                        $project_id = $task->project_id;
+                        $temp = $this->projects_model->select_project_by_id($project_id)->result();
                         $projects[$i] = $temp[0];
                         //$data['task_id'][$i] = $data['tasks'][$i]->id;
                         $data['project_name'][$i] = $projects[$i]->project_name;
@@ -224,6 +231,66 @@ class Translate extends CI_Controller {
                         $data['date_translated'][$i] = $translations[$i]->date_created;
                         $data['translation_id'][$i] = $translations[$i]->id;
                         $data['reviewed'][$i] = $translations[$i]->reviewed;
+                        $data['approved'][$i] = $translations[$i]->approved;
+                    }
+                }
+                else
+                    $data['translations_nr'] = 0;
+            }
+
+        }
+        $this->load->view("admin/translations/translations", $data);
+    }
+
+    function translations_approved()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/translations_approved'))
+            redirect("/pages/permission_exception");
+        $temp = func_get_args(0);
+        if($temp)
+            $approved = $temp[0];
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'Please specify if approved.');
+            redirect('admin/translate/translations');
+        }
+        if($approved == 1)
+            $data['make_active'] = 4;
+        if($approved == 0)
+            $data['make_active'] = 5;
+        $data['tasks'] = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
+        $data['translations_nr'] = false;
+        if($data['tasks'])
+        {
+            $ids = array();
+            for($i = 0; $i < sizeof($data['tasks']); $i++)
+            {
+                $ids[$i] = $data['tasks'][$i]->id;
+            }
+            if(sizeof($ids) > 0)
+            {
+                $translations = $this->translations_model->get_translations_by_task_ids($ids, false, null, $approved);
+                $data['translations_nr'] = sizeof($translations);
+                if($translations)
+                {
+                    for($i = 0; $i < $data['translations_nr']; $i++)
+                    {
+                        $task_id = $translations[$i]->task_id;
+                        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+                        $project_id = $task->project_id;
+                        $temp = $this->projects_model->select_project_by_id($project_id)->result();
+                        $projects[$i] = $temp[0];
+                        //$data['task_id'][$i] = $data['tasks'][$i]->id;
+                        $data['project_name'][$i] = $projects[$i]->project_name;
+                        $data['translate_from'][$i] = $projects[$i]->translate_from_language;
+                        $data['translate_to'][$i] = $projects[$i]->translate_to_language;
+                        $data['translate_text'][$i] = $data['tasks'][$i]->text;
+                        $data['translated_text'][$i] = $translations[$i]->translated_text;
+                        $data['date_translated'][$i] = $translations[$i]->date_created;
+                        $data['translation_id'][$i] = $translations[$i]->id;
+                        $data['reviewed'][$i] = $translations[$i]->reviewed;
+                        $data['approved'][$i] = $translations[$i]->approved;
                     }
                 }
                 else
@@ -278,6 +345,42 @@ class Translate extends CI_Controller {
             $reviewed = strip_tags($get_r);
             $id = strip_tags($get_id);
             $this->translations_model->set_reviewed($id, $reviewed);
+        }
+    }
+
+    function set_approved()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/set_approved'))
+            redirect("/pages/permission_exception");
+        $get_a = $this->input->get('a', true);
+        $get_id = $this->input->get('id', true);
+        if(isset($get_a) && isset($get_id))
+        {
+            $approved = strip_tags($get_a);
+            $id = strip_tags($get_id);
+            $this->translations_model->set_approved($id, $approved);
+        }
+    }
+
+    function remove_translation()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/remove_translation'))
+            redirect("/pages/permission_exception");
+        $translation_id = strip_tags($this->input->post("translation_id", true));
+        if($this->translations_model->get_translation_by_id($translation_id))
+        {
+            if($this->translations_model->delete_translation_by_id($translation_id))
+            {
+                $this->session->set_flashdata('message_type', 'success');
+                $this->session->set_flashdata('message', 'Translation was successfully removed.');
+                redirect("admin/translate/translations");
+            }
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This translation does not exist.');
+            redirect("admin/translate/translations");
         }
     }
 }

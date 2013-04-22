@@ -30,7 +30,7 @@
                             if($contributed_in_translation[$index])
                                 echo '<span style="display: none">1</span><i class="icon-ok"></i>';
                             else
-                                echo '<span style="display: none">0</span>';
+                                echo '<span style="display: none">0</span><i class="icon-minus"></i>';
                         ?>
                     </td>
                     <td style="text-align: center;">

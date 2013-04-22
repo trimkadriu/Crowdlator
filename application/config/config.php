@@ -360,17 +360,38 @@ $config['proxy_ips'] = '';
 
 /*
 |--------------------------------------------------------------------------
-| Reverse Proxy IPs
+| reCaptcha Settings
 |--------------------------------------------------------------------------
 |
-| If your server is behind a reverse proxy, you must whitelist the proxy IP
-| addresses from which CodeIgniter should trust the HTTP_X_FORWARDED_FOR
-| header in order to properly identify the visitor's IP address.
-| Comma-delimited, e.g. '10.0.1.200,10.0.1.201'
+| Generate a public and private keys for reCaptcha for your domain
+| https://www.google.com/recaptcha/admin/create
 |
 */
 $config['recaptcha_public_key'] = '6Ld-AeASAAAAAMaavnZufgl6HUlm0L8ysSHFzTyp';
 $config['recaptcha_private_key'] = '6Ld-AeASAAAAAJ65Rx3lVZOv_cUX3HlMAcCNfbXs';
+
+/*
+|--------------------------------------------------------------------------
+| Email Settings
+|--------------------------------------------------------------------------
+|
+| Email server settings
+|
+*/
+$config['crowdlator_useragent'] = 'Crowdlator';
+$config['crowdlator_protocol'] = 'smtp';
+$config['crowdlator_mailpath'] = '/usr/sbin/sendmail';
+$config['crowdlator_charset'] = 'utf-8';
+$config['crowdlator_smtp_host'] = 'localhost';
+$config['crowdlator_smtp_user'] = '';
+$config['crowdlator_smtp_pass'] = '';
+$config['crowdlator_smtp_port'] = '25';
+$config['crowdlator_smtp_timeout'] = '5';
+$config['crowdlator_priority'] = '3';
+$config['crowdlator_admin_email'] = 'admin@crowdlator.com';
+//These are only used while sending automated messages. There is no need that they exists for real in the server.
+$config['crowdlator_noreply_email'] = 'no-reply@crowdlator.com';
+$config['crowdlator_noreply_name'] = 'No Reply';
 
 
 /* End of file config.php */
