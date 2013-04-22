@@ -75,13 +75,41 @@ class Translations_model extends CI_Model {
             return $query->result();
     }
 
-    function get_translations_by_task_ids($task_ids, $limit, $reviewed = null)
+    function get_translation_by_id($translation_id)
+    {
+        $this->db->select('*');
+        $this->db->from('translations');
+        $this->db->where('id', $translation_id);
+        $this->db->order_by('date_created', 'desc');
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
+
+    function delete_translation_by_id($translation_id)
+    {
+        $this->db->trans_start();
+        $this->db->where('id', $translation_id);
+        $this->db->delete('translations');
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
+    function get_translations_by_task_ids($task_ids, $limit, $reviewed = null, $approved = null)
     {
         $this->db->select('*');
         $this->db->from('translations');
         $this->db->where('`task_id` IN ('.implode(',',$task_ids).')');
         if($reviewed != null)
             $this->db->where('reviewed', $reviewed);
+        if($approved != null)
+            $this->db->where('approved', $approved);
         $this->db->order_by('date_created', 'desc');
         if($limit)
             $this->db->limit($limit);
@@ -113,6 +141,21 @@ class Translations_model extends CI_Model {
         $this->db->trans_start();
         $data = array(
             'reviewed' => $reviewed
+        );
+        $this->db->where('id', $translation_id);
+        $this->db->update('translations', $data);
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return $log;
+    }
+
+    function set_approved($translation_id, $approved){
+        $this->db->trans_start();
+        $data = array(
+            'approved' => $approved
         );
         $this->db->where('id', $translation_id);
         $this->db->update('translations', $data);

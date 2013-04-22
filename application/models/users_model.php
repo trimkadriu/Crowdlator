@@ -30,6 +30,46 @@ class Users_model extends CI_Model {
 		else
 			return false;
 	}
+
+    function contact_email($full_name, $subject, $message, $email)
+    {
+        //Load configuration variables
+        $config = Array(
+            'useragent' => $this->config->item("crowdlator_useragent"),
+            'protocol' => $this->config->item("crowdlator_protocol"),
+            'charset' => $this->config->item("crowdlator_charset"),
+            'priority' => $this->config->item("crowdlator_priority"),
+            'protocol' => $this->config->item("crowdlator_protocol"),
+            'smtp_host' => $this->config->item("crowdlator_smtp_host"),
+            'smtp_port' => $this->config->item("crowdlator_smtp_port"),
+            'smtp_user' => $this->config->item("crowdlator_smtp_user"),
+            'smtp_pass' => $this->config->item("crowdlator_smtp_pass"),
+            'mailtype'  => 'text',
+        );
+        $this->load->library("email", $config);
+        $this->email->set_newline("\r\n");
+
+        //Load message params
+        $full_message = "Full name: ".$full_name."\nEmail: ".$email."\nMessage: \n".$message;
+        $no_reply_email = $this->config->item("crowdlator_noreply_email");
+        $no_reply_name = $this->config->item("crowdlator_noreply_name");
+        $admin_email = $this->config->item("crowdlator_admin_email");
+
+        $this->email->from($no_reply_email, $no_reply_name);
+        $this->email->to($admin_email );
+        $this->email->subject("Crowdlator message: ".$subject);
+        $this->email->message($full_message);
+        $status = true;
+        try
+        {
+            $this->email->send();
+        }
+        catch (Exception $ex)
+        {
+            $status = $ex->getMessage();
+        }
+        return $status;
+    }
 	
 	function check_user_by_username($username)
 	{

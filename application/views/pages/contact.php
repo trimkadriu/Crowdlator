@@ -2,9 +2,9 @@
 <?php $this->load->view('_inc/navbar'); ?>
 <div class="container" style="margin-top:80px;">
 <div>
- 	<h3>Contact Form</h3>
+ 	<h3>Give us your feedback</h3>
     <div class="span6" style="margin-left:0px;">
-		<?php echo form_open(base_url().'pages/contact');?>
+		<?php echo form_open(base_url('contact/email'));?>
         	<div class="control-group"><?php
 				echo form_label('Full name:', 'fullname', array('class', 'control-label')); ?>
                 <div class="controls"><?php
@@ -38,7 +38,7 @@
         	<div class="control-group"><?php
 				echo form_label('Message:', 'message', array('class', 'control-label')); ?>
                 <div class="controls"><?php
-					$input_subject = array('type' => 'textarea', 'name' => 'subject', 'rows' => '6',
+					$input_subject = array('type' => 'textarea', 'name' => 'message', 'rows' => '6',
 										'placeholder' => 'Your message', 'required' => 'required',
 										'class' => 'input-block-level');
 					echo form_textarea($input_subject); ?>
@@ -47,7 +47,7 @@
             
         	<div class="control-group">
                 <div class="controls">
-                	<button type="submit" class="btn btn-primary" id="submit">Send message</button>
+                	<button type="submit" class="btn btn-primary" id="submit">Send</button>
                 </div>
             </div>
 		<?php echo form_close(); ?>
