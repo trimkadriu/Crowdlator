@@ -54,7 +54,9 @@
     </div>
     <div class="span6">
     	<div class="well">
-        	<iframe width="100%" height="340" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=new+york+city&aq=&sll=37.6,-95.665&sspn=60.867771,135.263672&t=m&ie=UTF8&hq=&hnear=New+York&z=11&iwloc=A&output=embed">Your browser does not support iframes</iframe>
+            <a href="https://maps.google.com/maps?ll=<?php echo $latitude.','.$longitude.'&zoom='.$zoom; ?>&ctz=-120&t=v&output=embed" target="_blank">
+                <img src="http://maps.googleapis.com/maps/api/staticmap?center=<?php echo $latitude.','.$longitude.'&zoom='.$zoom; ?>&size=420x340&sensor=false">
+            </a>
         </div>
     </div>
 </div>

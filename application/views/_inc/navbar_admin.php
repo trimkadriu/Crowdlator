@@ -6,7 +6,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </a>
-        <a class="brand active" href="<?php echo base_url().'admin/user/dashboard'; ?>">Dashboard</a>
+        <a class="brand active" href="<?php echo base_url('admin/user/dashboard'); ?>">Dashboard</a>
         <div class="nav-collapse collapse">
           <ul class="nav">
 			<li class="divider-vertical" style="height:50px;"></li>

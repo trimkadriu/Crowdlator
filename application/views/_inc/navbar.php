@@ -7,7 +7,7 @@
             <span class="icon-bar"></span> 
             <span class="icon-bar"></span> 
 		</a> 
-        <a class="brand" href="<?php echo base_url().'pages/home'; ?>">Crowdlator</a> 
+        <a class="brand" href="<?php echo base_url().'pages/home'; ?>"><?php echo $this->config->item("application_logo"); ?></a>
         <div class="nav-collapse collapse">
           <ul class="nav">
             <li class="divider-vertical" style="height:50px;"> </li>
@@ -42,12 +42,6 @@
 					echo '<a href="'.base_url().'admin/user"><strong>Administration Panel</strong></a>';
 				}
 			?>
-              <!--<form class="navbar-form form-inline" action="" style="margin-top:5px">
-                <div class="input-append">
-                  <input class="input-large" id="search" type="text" placeholder="Enter your search query">
-                  <button class="btn btn-inverse" type="button">Search</button>
-                </div>
-              </form>-->
             </li>
           </ul>
         </div>
