@@ -370,6 +370,7 @@ $config['proxy_ips'] = '';
 $config['recaptcha_public_key'] = '6Ld-AeASAAAAAMaavnZufgl6HUlm0L8ysSHFzTyp';
 $config['recaptcha_private_key'] = '6Ld-AeASAAAAAJ65Rx3lVZOv_cUX3HlMAcCNfbXs';
 
+
 /*
 |--------------------------------------------------------------------------
 | Email Settings
@@ -393,6 +394,43 @@ $config['crowdlator_admin_email'] = 'admin@crowdlator.com';
 $config['crowdlator_noreply_email'] = 'no-reply@crowdlator.com';
 $config['crowdlator_noreply_name'] = 'No Reply';
 
+
+/*
+|--------------------------------------------------------------------------
+| Google maps settings
+|--------------------------------------------------------------------------
+|
+| Google maps settings affect the contact page
+|
+*/
+$config['google_maps_zoom'] = '13';
+$config['google_maps_latitude'] = '42.65796';
+$config['google_maps_longitude'] = '21.164013';
+
+
+/*
+|--------------------------------------------------------------------------
+| Privacy Policy & Terms and Conditions
+|--------------------------------------------------------------------------
+|
+| Privacy & Terms text
+|
+*/
+$config['privacy_policy'] = 'To be provided soon...';
+$config['terms_conditions'] = 'To be provided soon...';
+
+
+/*
+|--------------------------------------------------------------------------
+| Other Application Settings
+|--------------------------------------------------------------------------
+|
+| Some other settings
+|
+*/
+$config['application_name'] = 'Crowdlator';
+$config['application_issuer'] = 'Al Jazeera'; // Also you can add link "<a href="URL">LINK</a>"
+$config['application_logo'] = '<img src="../template/img/crowdlator_logo.png" style="width: 130px;" />'; // Also you can add simple text
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */

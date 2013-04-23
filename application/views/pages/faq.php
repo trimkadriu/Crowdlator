@@ -7,54 +7,20 @@
         <div class="round-border">
             <p>Some of the most frequently asked questions:</p>
             <div class="accordion" id="accordion2">
+                <?php for($i = 0; $i < sizeof($question); $i++){ ?>
                 <div class="accordion-group">
-                    <div class="accordion-heading">
-                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse1">
-                            What is Crowdlator ?
+                    <div class="accordion-heading" style="background-color: #E6E6E6">
+                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse<?php echo $i; ?>">
+                            <?php echo $question[$i]; ?>
                         </a>
                     </div>
-                    <div id="collapse1" class="accordion-body collapse in">
+                    <div id="collapse<?php echo $i; ?>" class="accordion-body collapse in">
                         <div class="accordion-inner">
-                            Soon will be updated.
+                            <?php echo $answer[$i]; ?>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse2">
-                            How does Crowdlator work ?
-                        </a>
-                    </div>
-                    <div id="collapse2" class="accordion-body collapse in">
-                        <div class="accordion-inner">
-                            Soon will be updated.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse3">
-                            What are the limits ?
-                        </a>
-                    </div>
-                    <div id="collapse3" class="accordion-body collapse in">
-                        <div class="accordion-inner">
-                            Soon will be updated.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-group">
-                    <div class="accordion-heading">
-                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse4">
-                            Is it free ?
-                        </a>
-                    </div>
-                    <div id="collapse4" class="accordion-body collapse in">
-                        <div class="accordion-inner">
-                            Soon will be updated.
-                        </div>
-                    </div>
-                </div>
+                <?php } ?>
             </div>
 		</div>
     </div>
