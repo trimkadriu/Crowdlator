@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+        <title><?php echo $this->config->item("application_title"); ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     	<link rel="stylesheet" type="text/css" href="<?php echo base_url('template/css/bootstrap.css'); ?>"/>
     	<link rel="stylesheet" type="text/css" href="<?php echo base_url('template/css/base.css'); ?>"/>

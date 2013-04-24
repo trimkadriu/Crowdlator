@@ -428,9 +428,10 @@ $config['terms_conditions'] = 'To be provided soon...';
 | Some other settings
 |
 */
+$config['application_title'] = 'Crowdlator';
 $config['application_name'] = 'Crowdlator';
 $config['application_issuer'] = 'Al Jazeera'; // Also you can add link "<a href="URL">LINK</a>"
-$config['application_logo'] = '<img src="../template/img/crowdlator_logo.png" style="width: 130px;" />'; // Also you can add simple text
+$config['application_logo'] = '<img src="http://localhost/crowdlator/template/img/crowdlator_logo.png" style="width: 130px;" />'; // Also you can add simple text
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */
