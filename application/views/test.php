@@ -46,7 +46,7 @@
             });
             $('#upload').click(function(e) {
                 e.preventDefault();
-                SC.accessToken('<?php echo $access_token; ?>');
+                SC.accessToken('<?php if(isset($access_token)) echo $access_token; ?>');
                 $('.status').html('Uploading...');
                 SC.recordUpload({
                     track: {

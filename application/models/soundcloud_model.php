@@ -21,7 +21,7 @@ class Soundcloud_model extends CI_Model {
         $params = $sc_client_id." ".$sc_secret." ".$sc_user." ".$sc_pass;
         //Execute python script and save results
         exec("python \"".$script_location."\" ".$params, $result);
-        return $result[0];
+        return $result;
     }
 
 }
