@@ -22,7 +22,6 @@
                             </a>
                         </li>
                     <?php } ?>
-                    <!-- <li><a tabindex="-1" href="#">Edit</a></li> -->
                     <?php if(check_permissions(get_session_roleid(), 'admin/projects/list_projects')) { ?>
                         <li>
                             <a tabindex="-1" href="<?php echo base_url('admin/projects/list_projects'); ?>">
@@ -44,15 +43,26 @@
 					Translations <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="translations-drop">
+                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/vote_translations')) { ?>
+                    <li>
+                        <a tabindex="-1" href="<?php echo base_url('admin/translate/vote_translations'); ?>">
+                            Vote translations
+                        </a>
+                    </li>
+                    <?php } ?>
                     <?php if(check_permissions(get_session_roleid(), 'admin/translate/translations')) { ?>
                         <li>
                             <a tabindex="-1" href="<?php echo base_url('admin/translate/translations'); ?>">
-                                List of translations
+                                My translated tasks
                             </a>
                         </li>
                     <?php } ?>
-                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/drafts')) { ?>
-                        <li><a tabindex="-1" href="#">Drafts</a></li>
+                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/draft_list')) { ?>
+                        <li>
+                            <a tabindex="-1" href="<?php echo base_url('admin/translate/draft_list'); ?>">
+                                My drafts
+                            </a>
+                        </li>
                     <?php } ?>
                     <?php if(check_permissions(get_session_roleid(), 'admin/translate/my_translations')) { ?>
                         <li>

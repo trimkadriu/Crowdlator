@@ -10,6 +10,7 @@ class User extends CI_Controller {
         $this->load->model('tasks_model');
         $this->load->model('projects_model');
         $this->load->model('translations_model');
+        $this->load->model('drafts_model');
     }
 
 	public function index()
@@ -19,9 +20,13 @@ class User extends CI_Controller {
         {
             $data = $this->get_administrator_data();
         }
-        if(get_user_role() == 'editor' || get_user_role() == 'super editor')
+        if(get_user_role() == 'editor')
         {
             $data = $this->get_editor_data();
+        }
+        if(get_user_role() == 'super editor')
+        {
+            $data = $this->get_super_editor_data();
         }
         if(get_user_role() == 'translator')
         {
@@ -92,12 +97,12 @@ class User extends CI_Controller {
         $data['left1'] = array('List all projects', '<i class="icon-tasks" style="margin-top:8px;"></i>',
             base_url('admin/projects/list_projects'));
         $data['left2'] = array('Vote the best translation', '<i class="icon-thumbs-up"></i>',
-            base_url('admin/projects/create_project'));
-        $data['right1'] = array('Add profile picture in user settings', '<i class="icon-picture" style="margin-top:8px;"></i>',
-            '#');
-        $data['right2'] = array('Share translations in social networks', '<i class="icon-share"></i>',
-            '#');
-
+            base_url('admin/translate/vote_translations'));
+        $data['right1'] = array('Share translations in social networks', '<i class="icon-share" style="margin-top:8px;"></i>',
+            base_url('admin/projects/list_projects'));
+        /*$data['right1'] = array('Add profile picture in user settings', '<i class="icon-picture" style="margin-top:8px;"></i>',
+            base_url('admin/settings/account_settings'));*/
+        $data['right2'] = array('', '', '');
         return $data;
     }
 
@@ -135,36 +140,66 @@ class User extends CI_Controller {
                 $data['translations'] = $this->translations_model->get_translations_by_task_ids($ids, $data['offset']);
             }
         }
-
-
         // START data for Forehead Message
         $data['title1'] = 'Get started:';
         $data['title2'] = 'Next steps:';
         $data['title3'] = '';
-        $data['button'] = array('Vote translations', base_url());
+        $data['button'] = array('Vote translations', base_url("admin/translate/vote_translations"));
         $data['left1'] = array('List your tasks', '<i class="icon-list" style="margin-top:5px;"></i>',
             base_url('admin/projects/list_tasks'));
         $data['left2'] = array('Ask help for translation', '<i class="icon-share"></i>',
             base_url('admin/projects/list_tasks'));
         $data['right1'] = array('', '', '');
         $data['right2'] = array('', '', '');
+        return $data;
+    }
 
+    public function get_super_editor_data()
+    {
+        // START data for Forehead Message
+        $data['title1'] = 'Get started:';
+        $data['title2'] = '';
+        $data['title3'] = '';
+        $data['button'] = array('Choose best translations', base_url("admin/translate/choose_translations"));
+        $data['left1'] = array('', '', '');
+        $data['left2'] = array('', '', '');
+        $data['right1'] = array('', '', '');
+        $data['right2'] = array('', '', '');
         return $data;
     }
 
     public function get_translator_data()
     {
+        //My drafts component
+        $data['drafts'] = $this->drafts_model->get_drafts_by_user_id(get_session_user_id(), 5);
+        //My translation component
+        $translations = $this->translations_model->get_translations_by_user_id(get_session_user_id(), 5);
+        $data['translation_nr'] = false;
+        if($translations)
+        {
+            $data['translation_nr'] = sizeof($translations);
+            for($i = 0; $i < $data['translation_nr']; $i++)
+            {
+                $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                $data['translation_id'][$i] = $translations[$i]->id;
+                $data['project_name'][$i] = $project->project_name;
+                $data['translated_date'][$i] = $translations[$i]->date_created;
+                $data['translated_from'][$i] = $project->translate_from_language;
+                $data['translated_to'][$i] = $project->translate_to_language;
+            }
+        }
+        // START data for Forehead Message
         $data['title1'] = 'Get started:';
         $data['title2'] = 'Next steps:';
         $data['title3'] = '';
         $data['button'] = array('Translate some tasks', base_url('admin/projects/list_projects'));
-        $data['left1'] = array('Add profile picture', '<i class="icon-picture" style="margin-top:8px;"></i>',
-            base_url('admin/settings/account_settings'));
+        $data['left1'] = array('Vote the best translation', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
+            base_url('admin/translate/vote_translations'));
         $data['left2'] = array('Share translations in social networks', '<i class="icon-share"></i>',
             base_url('admin/projects/list_projects'));
         $data['right1'] = array('', '', '');
         $data['right2'] = array('', '', '');
-
         return $data;
     }
 }

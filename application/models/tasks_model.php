@@ -20,7 +20,7 @@ class Tasks_model extends CI_Model {
 		if($this->db->trans_status() === TRUE)
 			return true;
 		else
-			return $log;
+			return false;
 	}
 	
 	function get_tasks_by_project_id($id)
@@ -68,7 +68,7 @@ class Tasks_model extends CI_Model {
 		if($this->db->trans_status() === TRUE)
 			return true;
 		else
-			return $log;
+			return false;
 	}
 
     function delete_tasks_by_project_id($project_id)
@@ -81,7 +81,7 @@ class Tasks_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function get_tasks_by_editor($editor_id)

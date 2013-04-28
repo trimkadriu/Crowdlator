@@ -208,7 +208,7 @@ class Users_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function update_user_info($id, $full_name, $address, $city, $country, $password, $email)
@@ -227,7 +227,7 @@ class Users_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
 }

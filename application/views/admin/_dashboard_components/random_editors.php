@@ -4,7 +4,7 @@
 <div class="span4 round-border" style="margin: 0 20px 0 0">
     <h4>
         Editors
-        <a href="<?php echo base_url('pages/register'); ?>" class="btn btn-link btn-small pull-right">
+        <a href="<?php echo base_url('admin/users/list_users'); ?>" class="btn btn-link btn-small pull-right">
             Add new Editor
         </a>
     </h4><hr/>

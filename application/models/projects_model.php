@@ -31,7 +31,7 @@ class Projects_model extends CI_Model {
 		if($this->db->trans_status() === TRUE)
 			return true;
 		else
-            return $log;
+            return false;
 	}
 	
 	function select_project_by_name($project_name)
@@ -103,7 +103,7 @@ class Projects_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function get_latest_projects($limit, $admin_id)
@@ -119,7 +119,7 @@ class Projects_model extends CI_Model {
             return $query->result();
     }
 
-    function edit_project_details($project_id, $project_name, $project_description, $hash_tags)
+    function edit_project_details($project_id, $project_name, $project_description, $hash_tags, $user_id = null)
     {
         $this->db->trans_start();
         $data = array(
@@ -128,13 +128,15 @@ class Projects_model extends CI_Model {
             'hash_tags' => $hash_tags
         );
         $this->db->where('id', $project_id);
+        if($user_id)
+            $this->db->where('admin_id', $user_id);
         $this->db->update('projects', $data);
         $this->db->trans_complete();
         $log = $this->db->last_query();
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function set_video_id($project_id, $video_id){
@@ -149,7 +151,7 @@ class Projects_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
 }
