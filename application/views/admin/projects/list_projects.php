@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php if($projects != null) { $index = 0; foreach($projects as $project) { ?>
+            <?php if($projects != null) { $index = 0; foreach($projects as $project) { ?>
                 <tr id="<?php echo $project->id; ?>">
                     <td><?php echo $project->id; ?></td>
                     <td><?php echo $project->project_name; ?></td>

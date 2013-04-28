@@ -342,7 +342,7 @@ class Projects extends CI_Controller {
                 $hashtags = $this->input->post("hashtags", TRUE);
             }
             // = $this->projects_model->select_project_by_id($project_id)->result()[0];
-            $update = $this->projects_model->edit_project_details($project_id, $project_name, $project_description, $hashtags);
+            $update = $this->projects_model->edit_project_details($project_id, $project_name, $project_description, $hashtags, get_session_user_id());
             if($update)
             {
                 $this->session->set_flashdata('message_type', 'success');

@@ -13,16 +13,15 @@
         </tr>
         </thead>
         <tbody>
-        <?php $projects = false; if($projects){
-            foreach($projects as $project) { ?>
+        <?php if($drafts) { for($i = 0; $i < sizeof($drafts); $i++) { ?>
             <tr>
-                <td><?php echo $project->project_name; ?></td>
-                <td style="text-align:center"><?php echo $project->status; ?></td>
+                <td><?php echo $drafts[$i]->task_id; ?></td>
+                <td style="text-align:center"><?php echo $drafts[$i]->date_created; ?></td>
             </tr>
-                <?php }}else{ ?>
+                <?php }} else { ?>
         <tr><td colspan="3">There are no records</td></tr>
             <?php } ?>
         </tbody>
     </table><hr/>
-    <a href="<?php echo base_url('admin/projects/list_projects'); ?>" class="btn btn-primary btn-small pull-right">View All ></a>
+    <a href="<?php echo base_url('admin/translate/draft_list'); ?>" class="btn btn-primary btn-small pull-right">View All ></a>
 </div>

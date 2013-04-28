@@ -9,8 +9,9 @@
             <strong>Translate from <?php echo $translate_from; ?>:</strong><br/>
             <textarea disabled="disabled" class="translate_text"><?php echo $text; ?></textarea><br/><br/>
             <strong>Translate to <?php echo $translate_to; ?>:</strong><br/>
-            <textarea name="translated" style="width: 100%; height: 150px; margin-top: 5px; resize: none;"></textarea>
+            <textarea name="translated" style="width: 100%; height: 150px; margin-top: 5px; resize: none;"><?php if(isset($draft_text)) echo $draft_text; ?></textarea>
             <input type="hidden" name="task_id" value="<?php echo $task_id; ?>"/>
+            <input type="hidden" name="draft_id" value="<?php if(isset($draft_id)) echo $draft_id; ?>"/>
             <!-- reCaptcha CODE -->
             <script type="text/javascript">
                 var RecaptchaOptions = {theme : 'clean'};
@@ -28,13 +29,19 @@
             <!-- reCaptcha CODE -->
             <input type="button" class="btn btn-danger" value="Cancel" onclick="history.back()"/>
             <div class="pull-right">
-                <input type="button" class="btn btn-info" value="Save to draft"/>
+                <input id="draft" type="button" class="btn btn-info" value="Save to draft"/>
                 <input type="submit" class="btn btn-primary" value="Translate"/>
             </div>
         </form>
     </div>
 </div>
+<script>
+    $("#draft").click(function() {
+        $("form").attr("action", "<?php echo base_url('admin/translate/drafts') ?>");
+        $("form").submit();
+    });
+</script>
 <style>
-.translate_text {width: 100%; height: 150px; margin-top: 5px; resize: none;}
+    .translate_text {width: 100%; height: 150px; margin-top: 5px; resize: none;}
 </style>
 <?php $this->load->view('_inc/footer_base'); ?>

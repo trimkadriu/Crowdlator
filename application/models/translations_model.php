@@ -21,7 +21,18 @@ class Translations_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
+    }
+
+    function get_all_translations()
+    {
+        $this->db->select('*');
+        $this->db->from('translations');
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
     }
 
     function count_translations($task_id)
@@ -46,7 +57,7 @@ class Translations_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function contributed_in_translation($user_id, $task_id)
@@ -62,12 +73,14 @@ class Translations_model extends CI_Model {
             return true;
     }
 
-    function get_translations_by_user_id($user_id)
+    function get_translations_by_user_id($user_id, $limit = null)
     {
         $this->db->select('*');
         $this->db->from('translations');
         $this->db->where('user_id', $user_id);
         $this->db->order_by('date_created', 'desc');
+        if($limit)
+            $this->db->limit($limit);
         $query = $this->db->get();
         if($query->num_rows() == 0)
             return false;
@@ -134,7 +147,7 @@ class Translations_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function set_reviewed($translation_id, $reviewed){
@@ -149,7 +162,7 @@ class Translations_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
     function set_approved($translation_id, $approved){
@@ -164,7 +177,7 @@ class Translations_model extends CI_Model {
         if($this->db->trans_status() === TRUE)
             return true;
         else
-            return $log;
+            return false;
     }
 
 }

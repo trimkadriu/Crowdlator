@@ -8,6 +8,7 @@ class Translate extends CI_Controller {
         $this->load->model('tasks_model');
         $this->load->model('projects_model');
         $this->load->model('translations_model');
+        $this->load->model('drafts_model');
     }
 
     function index()
@@ -159,7 +160,8 @@ class Translate extends CI_Controller {
                     for($i = 0; $i < $data['translations_nr']; $i++)
                     {
                         $task_id = $translations[$i]->task_id;
-                        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+                        $temp = $this->tasks_model->get_task_by_id($task_id);
+                        $task = $temp[0];
                         $project_id = $task->project_id;
                         $temp = $this->projects_model->select_project_by_id($project_id)->result();
                         $projects[$i] = $temp[0];
@@ -226,7 +228,7 @@ class Translate extends CI_Controller {
                         $data['project_name'][$i] = $projects[$i]->project_name;
                         $data['translate_from'][$i] = $projects[$i]->translate_from_language;
                         $data['translate_to'][$i] = $projects[$i]->translate_to_language;
-                        $data['translate_text'][$i] = $data['tasks'][$i]->text;
+                        $data['translate_text'][$i] = $task->text;
                         $data['translated_text'][$i] = $translations[$i]->translated_text;
                         $data['date_translated'][$i] = $translations[$i]->date_created;
                         $data['translation_id'][$i] = $translations[$i]->id;
@@ -285,7 +287,7 @@ class Translate extends CI_Controller {
                         $data['project_name'][$i] = $projects[$i]->project_name;
                         $data['translate_from'][$i] = $projects[$i]->translate_from_language;
                         $data['translate_to'][$i] = $projects[$i]->translate_to_language;
-                        $data['translate_text'][$i] = $data['tasks'][$i]->text;
+                        $data['translate_text'][$i] = $task->text;
                         $data['translated_text'][$i] = $translations[$i]->translated_text;
                         $data['date_translated'][$i] = $translations[$i]->date_created;
                         $data['translation_id'][$i] = $translations[$i]->id;
@@ -382,6 +384,191 @@ class Translate extends CI_Controller {
             $this->session->set_flashdata('message', 'This translation does not exist.');
             redirect("admin/translate/translations");
         }
+    }
+
+    function vote()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/vote'))
+            redirect("/pages/permission_exception");
+        // GET request
+        $temp = func_get_args(0);
+        if($temp)
+            $translation_id = $temp[0];
+        if(!$translation_id)
+            redirect("admin/user/dashboard");
+        $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
+        $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
+        $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+        if($translation)
+        {
+            $data['translate_from'] = $project->translate_from_language;
+            $data['translate_to'] = $project->translate_to_language;
+            $data['text'] = $task->text;
+            $data['translated'] = $translation->translated_text;
+            $data['translation_id'] = $translation_id;
+            $data['project_name'] = $project->project_name;
+            $data['project_video_id'] = $project->video_id;
+            $data['project_description'] = $project->project_description;
+            $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project->id)->result();
+//            $data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $this->load->view("admin/translations/vote", $data);
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This translation does not exist.');
+            redirect(base_url());
+        }
+    }
+
+    public function vote_translations()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/vote_translations'))
+            redirect("/pages/permission_exception");
+        $temp = func_get_args(0);
+        if($temp)
+            $type = $temp[0];
+        if(isset($type) && $type == 1)
+            $data['make_active'] = 1;
+        else
+            $data['make_active'] = 0;
+        $translations = $this->translations_model->get_all_translations();
+        $data['translation_nr'] = false;
+        if($translations)
+        {
+            $data['translation_nr'] = sizeof($translations);
+            for($i = 0; $i < $data['translation_nr']; $i++)
+            {
+                $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                $data['translation_id'][$i] = $translations[$i]->id;
+                $data['project_name'][$i] = $project->project_name;
+                $data['date_translated'][$i] = $translations[$i]->date_created;
+                $data['translate_from'][$i] = $project->translate_from_language;
+                $data['translate_to'][$i] = $project->translate_to_language;
+            }
+        }
+        $this->load->view("admin/translations/vote_translations", $data);
+    }
+
+    public function draft_list()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/draft_list'))
+            redirect("/pages/permission_exception");
+        $drafts = $this->drafts_model->get_drafts_by_user_id(get_session_user_id());
+        $data['drafts_nr'] = false;
+        if($drafts)
+        {
+            $data['drafts_nr'] = sizeof($drafts);
+            for($i = 0; $i < $data['drafts_nr']; $i++)
+            {
+                $task = $this->tasks_model->get_task_by_id($drafts[$i]->task_id)[0];
+                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                $data['project_name'][$i] = $project->project_name;
+                $data['date_saved'][$i] = $drafts[$i]->date_created;
+                $data['translated_from'][$i] = $project->translate_from_language;
+                $data['translated_to'][$i] = $project->translate_to_language;
+                $data['draft_id'][$i] = $drafts[$i]->id;
+            }
+        }
+        $this->load->view("admin/translations/draft_list", $data);
+    }
+
+    public function drafts()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/drafts'))
+            redirect("/pages/permission_exception");
+        //For saving to drafts
+        if($_POST)
+        {
+            $draft_id = strip_tags($this->input->post("draft_id", true));
+            $task_id = strip_tags($this->input->post("task_id", true));
+            //reCaptcha Validation
+            $this->load->library("recaptcha");
+            $this->recaptcha->recaptcha_check_answer(
+                $_SERVER['REMOTE_ADDR'],
+                $this->input->post('recaptcha_challenge_field'),
+                $this->input->post('recaptcha_response_field')
+            );
+            if(!$this->recaptcha->is_valid)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                redirect("admin/translate/task_id/".$task_id);
+            }
+            $draft_text = strip_tags($this->input->post("translated", true));
+            if($draft_id != null)
+                $result = $this->drafts_model->update_draft_by_id($draft_id, $draft_text, get_session_user_id());
+            else
+                $result = $this->drafts_model->create_draft(get_session_user_id(), $task_id, $draft_text);
+            if($result)
+            {
+                $this->session->set_flashdata('message_type', 'success');
+                $this->session->set_flashdata('message', 'This translation is saved in drafts. Later you can continue translating it.');
+                redirect(base_url("admin/translate/draft_list"));
+            }
+            else
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'There was a problem saving your translation in draft. Please try again later.');
+                redirect(base_url("admin/user/dashboard"));
+            }
+        }
+        //Get current draft
+        $temp = func_get_args(0);
+        if($temp)
+            $draft_id = $temp[0];
+        if(!$draft_id)
+            redirect("admin/user/dashboard");
+        $draft = $this->drafts_model->get_draft_by_id($draft_id, get_session_user_id())[0];
+        $task_id = $draft->task_id;
+        $temp = $this->tasks_model->get_task_by_id($task_id);
+        $task = $temp[0];
+        if($task)
+        {
+            $project_id = $task->project_id;
+            $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+            $project = $temp1[0];
+            $data['project_name'] = $project->project_name;
+            $data['translate_from'] = $project->translate_from_language;
+            $data['translate_to'] = $project->translate_to_language;
+            $data['text'] = $task->text;
+            $data['task_id'] = $task_id;
+            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['draft_text'] = $draft->draft_text;
+            $data['draft_id'] = $draft_id;
+            $this->load->view("admin/projects/translate", $data);
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This draft does not exist.');
+            redirect("admin/user/dashboard");
+        }
+    }
+
+    function delete_draft()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/delete_draft'))
+            redirect("/pages/permission_exception");
+        $temp = func_get_args(0);
+        if($temp)
+            $draft_id = $temp[0];
+        if(!$draft_id)
+            redirect("admin/user/dashboard");
+        if($this->drafts_model->delete_draft_by_id($draft_id, get_session_user_id()))
+        {
+            $this->session->set_flashdata('message_type', 'success');
+            $this->session->set_flashdata('message', 'Draft is deleted successfully.');
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'There was a problem deleting this draft. Please try again later.');
+        }
+        redirect("admin/translate/draft_list");
+
     }
 }
 ?>

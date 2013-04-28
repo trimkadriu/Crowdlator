@@ -9,23 +9,23 @@
         <thead>
         <tr>
             <th style="width: 30%;">Project Name</th>
-            <th style="width: 25%;">Date</th>
+            <th style="width: 30%;">Date</th>
             <th style="width: 20%;">From</th>
             <th style="width: 20%;">To</th>
-            <th style="width: 5%;">Type</th>
         </tr>
         </thead>
         <tbody>
-        <?php $projects = false;  if($projects){
-            foreach($projects as $project) { ?>
+        <?php if($translation_nr > 0){ for($i = 0; $i < $translation_nr; $i++) { ?>
             <tr>
-                <td><?php echo $project->project_name; ?></td>
-                <td style="text-align:center"><?php echo $project->status; ?></td>
+                <td><?php echo $project_name[$i]; ?></td>
+                <td><?php echo $translated_date[$i]; ?></td>
+                <td><?php echo $translated_from[$i]; ?></td>
+                <td><?php echo $translated_to[$i]; ?></td>
             </tr>
-                <?php }}else{ ?>
-            <tr><td colspan="5">There are no records</td></tr>
+            <?php }}else{ ?>
+                <tr><td colspan="5">There are no records</td></tr>
             <?php } ?>
         </tbody>
     </table><hr/>
-    <a href="<?php echo base_url('admin/projects/list_projects'); ?>" class="btn btn-primary btn-small pull-right">View All ></a>
+    <a href="<?php echo base_url('admin/translate/my_translations'); ?>" class="btn btn-primary btn-small pull-right">View All ></a>
 </div>

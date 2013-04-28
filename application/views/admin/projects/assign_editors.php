@@ -4,7 +4,7 @@
 <body>
 <div class="container round-border">
     <h3 style="margin-left:20px">
-    	Assign tasks to editors for "<?php echo $project[0]->project_name; ?>"
+    	Assign tasks to editors for "<?php echo $translation[0]->project_name; ?>"
 	</h3><hr/>
     <div style="margin:20px;">
         <table class="table table-hover datatable">
@@ -86,7 +86,7 @@
         $.post('<?php echo base_url("admin/projects/assign_editors_ajax") ?>', {
             task_id: id,
             editor: editor_name,
-            project_id: '<?php echo $project[0]->id; ?>'
+            project_id: '<?php echo $translation[0]->id; ?>'
         }).done(function(data){
             var response = $.parseJSON(data);
             if(response.msg == "true"){

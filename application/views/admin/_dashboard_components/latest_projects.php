@@ -17,14 +17,13 @@
         </tr>
         </thead>
         <tbody>
-        <?php if($projects){
-            foreach($projects as $project) { ?>
+        <?php if($projects){ foreach($projects as $project) { ?>
             <tr>
                 <td><?php echo $project->id; ?></td>
                 <td><?php echo $project->project_name; ?></td>
                 <td><?php echo $project->status; ?></td>
             </tr>
-                <?php }}else{ ?>
+                <?php }} else{ ?>
         <tr><td colspan="3">There are no records</td></tr>
             <?php } ?>
         </tbody>
