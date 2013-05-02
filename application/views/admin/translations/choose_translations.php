@@ -2,14 +2,14 @@
 <body>
 <div class="container round-border">
     <h3 style="margin-left:20px">
-        List of translations to vote
+        Choose best translations for projects
     </h3><hr/>
     <ul class="nav nav-tabs">
         <li <?php if($make_active == 0) echo 'class="active"'; ?>>
-            <a href="<?php echo base_url("admin/translate/vote_translations/0"); ?>">Text translations</a>
+            <a href="<?php echo base_url("admin/translate/choose_translations/0"); ?>">Text translations</a>
         </li>
         <li <?php if($make_active == 1) echo 'class="active"'; ?>>
-            <a href="<?php echo base_url("admin/translate/vote_translations/1"); ?>">Audio translations</a>
+            <a href="<?php echo base_url("admin/translate/choose_translations/1"); ?>">Audio translations</a>
         </li>
     </ul>
     <div style="margin:20px;">
@@ -19,8 +19,8 @@
                 <th style="width:20%;">Project name<br/>Date translated</th>
                 <th style="width:15%;">From</th>
                 <th style="width:15%;">To</th>
-                <th style="width:8%; text-align: center;">Voted</th>
                 <th style="width:10%; text-align: center;">Votes:<br/>Good / Bad</th>
+                <th style="width:8%; text-align: center;">Choose Translation</th>
                 <th style="width:15%; text-align: center;">Actions</th>
             </tr>
             </thead>
@@ -31,13 +31,19 @@
                 <td><?php echo $translate_from[$i]; ?></td>
                 <td><?php echo $translate_to[$i]; ?></td>
                 <td style="text-align: center">
-                    <?php if($voted[$i]) echo '<span style="display: none;">1</span><i class="icon-ok"></i>';
-                          else echo '<span style="display: none;">0</span><i class="icon-minus"></i>'; ?>
-                </td>
-                <td style="text-align: center">
                     <span style="display: none"><?php echo $good_votes[$i] - $bad_votes[$i]; ?></span>
                     <span class="badge badge-success"><?php echo $good_votes[$i]; ?></span> /
                     <span class="badge badge-important"><?php echo $bad_votes[$i]; ?></span>
+                </td>
+                <td style="text-align: center">
+                    <ul class="nav nav-pills">
+                        <li>
+                            <a style="cursor: pointer;" href="#choose_modal" data-toggle="modal"
+                               onclick="prepare_choose_modal('<?php echo $translation_id[$i]; ?>')">
+                                Choose Translation
+                            </a>
+                        </li>
+                    </ul>
                 </td>
                 <td style="text-align: left">
                     <?php
@@ -45,14 +51,12 @@
                         $translated_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $translated[$i]));
                         $from = $translate_from[$i];
                         $to = $translate_to[$i];
-                        if(!$voted[$i]){
                     ?>
-                    <a rel="tooltip" data-placement="top" data-original-title="Review & Vote on this translation"
-                       data-toggle="modal" href="#vote_modal" onclick="prepare_vote_modal('<?php echo $original_text; ?>',
+                    <a rel="tooltip" data-placement="top" data-original-title="Review this translation"
+                       data-toggle="modal" href="#review_modal" onclick="prepare_review_modal('<?php echo $original_text; ?>',
                             '<?php echo $translated_text; ?>', '<?php echo $translation_id[$i]; ?>', '<?php echo $from; ?>', '<?php echo $to; ?>');">
-                        <i class="icon-check"></i> Review & Vote
+                        <i class="icon-check"></i> Review
                     </a><br/>
-                    <?php } ?>
                     <a onclick="prepare_video_modal('<?php echo $project_video_id[$i]; ?>', '<?php echo $project_name[$i]; ?>', $('#description_<?php echo $i; ?>').val());"
                        href="#video_modal" rel="tooltip" data-placement="top" data-original-title="Open video of this project." data-toggle="modal">
                         <i class="icon-film"></i> See video
@@ -60,18 +64,6 @@
                     <textarea id="description_<?php echo $i; ?>" style="display: none;">
                         <?php echo strip_quotes(strip_slashes(trim($project_description[$i]))); ?>
                     </textarea><br/>
-                    <span rel="tooltip" data-placement="top" data-original-title="Ask to vote by sharing it on Facebook.">
-                        <a href="#" onclick="facebook_share()">
-                            <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
-                                 style="width: 13px; height: 13px"/> Facebook
-                        </a>
-                    </span><br/>
-                    <span rel="tooltip" data-placement="top" data-original-title="Ask to vote by sharing it on Twitter.">
-                        <a href="#" onclick="twitter_share()">
-                            <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
-                                 style="width: 13px; height: 13px"/> Twitter
-                        </a>
-                    </span>
                 </td>
             </tr>
                 <?php } } else {?>
@@ -99,32 +91,32 @@
         <a class="btn" data-dismiss="modal">Close</a>
     </div>
 </div>
-<div class="modal hide fade" id="vote_modal">
+<div class="modal hide fade" id="review_modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Contribute by voting this task</h3>
+        <h3>Review</h3>
     </div>
     <div class="modal-body">
-        <form id="vote_modal_form" action="<?php echo base_url('admin/translate/vote'); ?>" method="post">
             <strong>Translation from <span id="vote_modal_from"></span>:</strong><br/>
             <textarea id="vote_modal_text" disabled="disabled" class="translate_text"></textarea><br/><br/>
             <strong>Translated to <span id="vote_modal_to"></span>:</strong><br/>
             <textarea id="vote_modal_translated" disabled="disabled" class="translate_text"></textarea>
-            <input id="vote_modal_translation_id" type="hidden" name="id"/>
-            <input type="hidden" name="translation_type" value="text">
-            <input id="vote_modal_vote_type" type="hidden" name="vote_type">
-        </form>
     </div>
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">Close</a>
-        <button id="bad_vote" type="button" class="btn btn-danger" style="width: 100px;">
-            <img style="height: 16px;" class="invert"
-                 src="<?php echo base_url("template/img/extra_icons/glyphicons_344_thumbs_down.png"); ?>"/> Bad
-        </button>
-        <button id="good_vote" type="button" class="btn btn-success" style="width: 100px;">
-            <img style="height: 16px;" class="invert"
-                 src="<?php echo base_url("template/img/extra_icons/glyphicons_343_thumbs_up.png"); ?>"/> Good
-        </button>
+    </div>
+</div>
+<div class="modal hide fade" id="choose_modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Choose translation confirmation</h3>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to choose this translation for its task as the best translation ?</p>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-danger" data-dismiss="modal">No</a>
+        <a class="btn btn-success" id="choose_confirm">Yes</a>
     </div>
 </div>
 <script>
@@ -134,37 +126,19 @@
         $("#description").text(project_description);
     }
 
-    function prepare_vote_modal(text, translated, id, from, to) {
+    function prepare_review_modal(text, translated, id, from, to) {
         $("#vote_modal_text").val(text);
         $("#vote_modal_translated").val(translated);
-        $("#vote_modal_translation_id").val(id);
         $("#vote_modal_from").val(from);
         $("#vote_modal_to").val(to);
     }
 
-    function facebook_share() {
-        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href),
-                '', 'width=600,height=300');
-    }
-
-    function twitter_share() {
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation ') +
-                encodeURIComponent(window.location.href),
-                '', 'width=600,height=300');
+    function prepare_choose_modal(id) {
+        $("#choose_confirm").attr("href", "<?php echo base_url('admin/translate/chose_translation'); ?>/" + id);
     }
 
     $(document).ready(function() {
         $("[rel=tooltip]").tooltip();
-
-        $("#good_vote").click(function() {
-            $("#vote_modal_vote_type").val("good");
-            $("#vote_modal_form").submit();
-        });
-
-        $("#bad_vote").click(function() {
-            $("#vote_modal_vote_type").val("bad");
-            $("#vote_modal_form").submit();
-        });
     });
 </script>
 <style>
@@ -173,14 +147,6 @@
         height: 150px;
         margin-top: 5px;
         resize: none;
-    }
-
-    .invert{
-        filter: invert(100%);
-        -webkit-filter: invert(100%);
-        -moz-filter: invert(100%);
-        -o-filter: invert(100%);
-        -ms-filter: invert(100%);
     }
 </style>
 <?php $this->load->view('_inc/datatables'); ?>

@@ -1,3 +1,4 @@
+
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class User extends CI_Controller {
@@ -161,7 +162,8 @@ class User extends CI_Controller {
         $data['title2'] = '';
         $data['title3'] = '';
         $data['button'] = array('Choose best translations', base_url("admin/translate/choose_translations"));
-        $data['left1'] = array('', '', '');
+        $data['left1'] = array('Vote the best translation', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
+            base_url('admin/translate/vote_translations'));
         $data['left2'] = array('', '', '');
         $data['right1'] = array('', '', '');
         $data['right2'] = array('', '', '');

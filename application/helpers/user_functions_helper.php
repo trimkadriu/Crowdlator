@@ -109,6 +109,27 @@ function check_login()
 //
 //  Some user util functions
 //
+function set_voted_by_id_and_type($id, $type)
+{
+    //Set cookie
+    setcookie("crowdlator-".$id."-".$type, 1, time() + 86400*365);
+}
+
+function get_if_voted_by_id_type($id, $type)
+{
+    //Read if it has cookies
+    $cookie = false;
+    if(isset($_COOKIE["crowdlator-".$id."-".$type]))
+        $cookie = $_COOKIE['vote'];
+    if($cookie)
+    {
+        $CI =& get_instance();
+        $CI->session->set_flashdata('message_type', 'error');
+        $CI->session->set_flashdata('message', 'You have already voted in this translation.');
+        redirect('pages/home/');
+    }
+}
+
 function get_html_country_dropdown_list()
 {
     $html = '<div class="control-group">'.

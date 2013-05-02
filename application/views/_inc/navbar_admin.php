@@ -43,6 +43,13 @@
 					Translations <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="translations-drop">
+                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/choose_translations')) { ?>
+                    <li>
+                        <a tabindex="-1" href="<?php echo base_url('admin/translate/choose_translations'); ?>">
+                            Choose best translations
+                        </a>
+                    </li>
+                    <?php } ?>
                     <?php if(check_permissions(get_session_roleid(), 'admin/translate/vote_translations')) { ?>
                     <li>
                         <a tabindex="-1" href="<?php echo base_url('admin/translate/vote_translations'); ?>">

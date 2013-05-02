@@ -15,7 +15,7 @@ class Contact extends CI_Controller {
 		{
 			$this->session->set_flashdata('message_type', 'error');
 			$this->session->set_flashdata('message', 'Please fill all required form fields in correct format.');
-			redirect('pages/register');
+			redirect('pages/contact');
 		}
 		else
 		{
