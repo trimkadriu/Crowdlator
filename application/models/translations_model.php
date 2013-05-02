@@ -101,6 +101,19 @@ class Translations_model extends CI_Model {
             return $query->result();
     }
 
+    function check_translation_by_task_id($task_id)
+    {
+        $this->db->select('*');
+        $this->db->from('translations');
+        $this->db->where('task_id', $task_id);
+        //$this->db->order_by('date_created', 'desc');
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
+
     function delete_translation_by_id($translation_id)
     {
         $this->db->trans_start();
@@ -178,6 +191,41 @@ class Translations_model extends CI_Model {
             return true;
         else
             return false;
+    }
+
+    function set_choosen($translation_id, $choosen){
+        $this->db->trans_start();
+        $data = array(
+            'choosen' => $choosen
+        );
+        $this->db->where('id', $translation_id);
+        $this->db->update('translations', $data);
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
+    function get_all_translations_where_choosen_not($choosen)
+    {
+        $sql = "SELECT * FROM `translations` WHERE task_id NOT IN (SELECT task_id FROM `translations` WHERE choosen = ".$choosen.");";
+        $query = $this->db->query($sql);
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
+
+    function check_translation_if_choosen($task_id)
+    {
+        $sql = "SELECT * FROM `translations` WHERE `task_id` = ".$task_id." AND `choosen` = 1;";
+        $query = $this->db->query($sql);
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return true;
     }
 
 }

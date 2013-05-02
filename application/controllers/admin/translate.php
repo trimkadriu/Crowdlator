@@ -9,6 +9,7 @@ class Translate extends CI_Controller {
         $this->load->model('projects_model');
         $this->load->model('translations_model');
         $this->load->model('drafts_model');
+        $this->load->model('votes_model');
     }
 
     function index()
@@ -386,42 +387,6 @@ class Translate extends CI_Controller {
         }
     }
 
-    function vote()
-    {
-        if(!check_permissions(get_session_roleid(), 'admin/translate/vote'))
-            redirect("/pages/permission_exception");
-        // GET request
-        $temp = func_get_args(0);
-        if($temp)
-            $translation_id = $temp[0];
-        if(!$translation_id)
-            redirect("admin/user/dashboard");
-        $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
-        $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
-        $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
-        if($translation)
-        {
-            $data['translate_from'] = $project->translate_from_language;
-            $data['translate_to'] = $project->translate_to_language;
-            $data['text'] = $task->text;
-            $data['translated'] = $translation->translated_text;
-            $data['translation_id'] = $translation_id;
-            $data['project_name'] = $project->project_name;
-            $data['project_video_id'] = $project->video_id;
-            $data['project_description'] = $project->project_description;
-            $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project->id)->result();
-//            $data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
-            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
-            $this->load->view("admin/translations/vote", $data);
-        }
-        else
-        {
-            $this->session->set_flashdata('message_type', 'error');
-            $this->session->set_flashdata('message', 'This translation does not exist.');
-            redirect(base_url());
-        }
-    }
-
     public function vote_translations()
     {
         if(!check_permissions(get_session_roleid(), 'admin/translate/vote_translations'))
@@ -447,9 +412,127 @@ class Translate extends CI_Controller {
                 $data['date_translated'][$i] = $translations[$i]->date_created;
                 $data['translate_from'][$i] = $project->translate_from_language;
                 $data['translate_to'][$i] = $project->translate_to_language;
+                $data['text'][$i] = $task->text;
+                $data['translated'][$i] = $translations[$i]->translated_text;
+                $data['project_video_id'][$i] = $project->video_id;
+                $data['project_description'][$i] = $project->project_description;
+                $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
+                $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
+                $data['voted'][$i] = $this->votes_model->get_if_user_voted($translations[$i]->id, null, get_session_user_id(), "text");
             }
         }
         $this->load->view("admin/translations/vote_translations", $data);
+    }
+
+    public function vote()
+    {
+        if($_POST)
+        {
+            $translation_type = $this->input->post(strip_tags("translation_type"), true);
+            $translation_id = $this->input->post(strip_tags("id"), true);
+            $vote_type = $this->input->post(strip_tags("vote_type"), true);
+            $already_voted = true;
+            $result = false;
+            //Some validations
+            if($vote_type == "bad" || $vote_type == "good")
+            {
+                if($translation_type == "text" || $translation_type == "audio")
+                {
+                    if(get_session_user_id())
+                    {
+                        if($translation_type == "text")
+                            $already_voted = $this->votes_model->get_if_user_voted($translation_id, null, get_session_user_id(), "text");
+                        else if($translation_type == "audio")
+                            $already_voted = $this->votes_model->get_if_user_voted(null, $translation_id, get_session_user_id(), "audio");
+                    }
+                    else
+                    {
+                        //Public Vote
+                        //reCaptcha Validation
+                        $this->load->library("recaptcha");
+                        $this->recaptcha->recaptcha_check_answer(
+                            $_SERVER['REMOTE_ADDR'],
+                            $this->input->post('recaptcha_challenge_field'),
+                            $this->input->post('recaptcha_response_field')
+                        );
+                        if(!$this->recaptcha->is_valid)
+                        {
+                            $this->session->set_flashdata('message_type', 'error');
+                            $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                            redirect("public/vote/translation/".$translation_id);
+                        }
+                        get_if_voted_by_id_type($translation_id, $translation_type);
+                        if($translation_type == "text")
+                        {
+                            //For text translations
+                            if($vote_type == "bad")
+                                $result = $this->votes_model->create_new($translation_id, null, null, "text", null, 1);
+                            else if($vote_type == "good")
+                                $result = $this->votes_model->create_new($translation_id, null, null, "text", 1, null);
+                        }
+                        else if($translation_type == "audio")
+                        {
+                            //For audio translations
+                            if($vote_type == "bad")
+                                $result = $this->votes_model->create_new(null, $translation_id, null, "audio", null, 1);
+                            else if($vote_type == "good")
+                                $result = $this->votes_model->create_new(null, $translation_id, null, "audio", 1, null);
+                        }
+                        //Drop some Cookies to validate that this user have voted
+                        set_voted_by_id_and_type($translation_id, $translation_type);
+                        if($result)
+                        {
+                            $this->session->set_flashdata('message_type', 'success');
+                            $this->session->set_flashdata('message', 'You have successfully voted.');
+                        }
+                        redirect();
+                    }
+                    if(!$already_voted)
+                    {
+                        if($translation_type == "text")
+                        {
+                            //For text translations
+                            if($vote_type == "bad")
+                                $result = $this->votes_model->create_new($translation_id, null, get_session_user_id(), "text", null, 1);
+                            else if($vote_type == "good")
+                                $result = $this->votes_model->create_new($translation_id, null, get_session_user_id(), "text", 1, null);
+                        }
+                        else if($translation_type == "audio")
+                        {
+                            //For audio translations
+                            if($vote_type == "bad")
+                                $result = $this->votes_model->create_new(null, $translation_id, get_session_user_id(), "audio", null, 1);
+                            else if($vote_type == "good")
+                                $result = $this->votes_model->create_new(null, $translation_id, get_session_user_id(), "audio", 1, null);
+                        }
+                    }
+                    else
+                    {
+                        $this->session->set_flashdata('message_type', 'error');
+                        $this->session->set_flashdata('message', 'You have alredy voted this translation.');
+                        redirect("admin/translate/vote_translations");
+                    }
+                }
+                else
+                {
+                    $this->session->set_flashdata('message_type', 'error');
+                    $this->session->set_flashdata('message', 'Translation type invalid.');
+                    redirect("admin/translate/vote_translations");
+                }
+            }
+            else
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Vote type invalid.');
+                redirect("admin/translate/vote_translations");
+            }
+        }
+        if($result)
+        {
+            $this->session->set_flashdata('message_type', 'success');
+            $this->session->set_flashdata('message', 'You have successfully voted.');
+        }
+        redirect("admin/translate/vote_translations");
     }
 
     public function draft_list()
@@ -568,7 +651,96 @@ class Translate extends CI_Controller {
             $this->session->set_flashdata('message', 'There was a problem deleting this draft. Please try again later.');
         }
         redirect("admin/translate/draft_list");
+    }
 
+    function choose_translations()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/choose_translations'))
+            redirect("/pages/permission_exception");
+        $temp = func_get_args(0);
+        if($temp)
+            $type = $temp[0];
+        if(isset($type) && $type == 1)
+            $data['make_active'] = 1;
+        else
+            $data['make_active'] = 0;
+        $translations = $this->translations_model->get_all_translations_where_choosen_not(1);
+        $data['translation_nr'] = false;
+        if($translations)
+        {
+            $data['translation_nr'] = sizeof($translations);
+            for($i = 0; $i < $data['translation_nr']; $i++)
+            {
+                $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                $data['translation_id'][$i] = $translations[$i]->id;
+                $data['project_name'][$i] = $project->project_name;
+                $data['date_translated'][$i] = $translations[$i]->date_created;
+                $data['translate_from'][$i] = $project->translate_from_language;
+                $data['translate_to'][$i] = $project->translate_to_language;
+                $data['text'][$i] = $task->text;
+                $data['translated'][$i] = $translations[$i]->translated_text;
+                $data['project_video_id'][$i] = $project->video_id;
+                $data['project_description'][$i] = $project->project_description;
+                $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
+                $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
+                $data['choosen'][$i] = $translations[$i]->choosen;
+            }
+        }
+        $this->load->view("admin/translations/choose_translations", $data);
+    }
+
+    function chose_translation()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/chose_translation'))
+            redirect("/pages/permission_exception");
+        $translations = func_get_args(0);
+        if($translations)
+            $translation_id = $translations[0];
+        if(!$translation_id)
+            redirect("admin/user/dashboard");
+        $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
+        $choosen = $translation->choosen;
+        $this->session->set_flashdata('message_type', 'error');
+        $this->session->set_flashdata('message', 'Translation was already choosen.');
+        if($choosen == 0)
+        {
+            if(!$this->translations_model->check_translation_if_choosen($translation->task_id))
+            {
+                $result = $this->translations_model->set_choosen($translation_id, 1);
+                $this->session->set_flashdata('message_type', 'success');
+                $this->session->set_flashdata('message', 'That translation was choosen the best.');
+            }
+        }
+        if($result)
+        {
+            //FIXME - Here should add check project status
+        }
+        redirect(base_url("admin/translate/choose_translations/0"));
+    }
+
+    private function check_project_status()
+    {
+        $translation = null;
+        $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
+        $tasks = $this->tasks_model->get_tasks_by_project_id($task->project_id)->result();
+        //$ids = array();
+        $finished_status = true;
+        for($i = 0; $i < sizeof($tasks); $i++)
+        {
+            $ids[$i] = $tasks[$i]->id;
+            $translations = $this->translations_model->check_translation_by_task_id($ids[$i]);// print_r($translations);exit;
+            for($j = 0; $j < 3; $j++)
+            {
+                if($translations[$i]->choosen == 1)
+                {
+                    $finished_status = true;
+                    break;
+                }
+                else
+                    $finished_status = false;
+            }
+        }
     }
 }
 ?>

@@ -24,8 +24,9 @@ class Vote extends CI_Controller {
             redirect(base_url());
         if($this->session->userdata("loggedin") && check_permissions(get_session_roleid(), 'admin/translate/vote'))
         {
-            redirect(base_url('admin/translate/vote/'.$translation_id));
+            redirect(base_url('admin/translate/vote_translations'));
         }
+        get_if_voted_by_id_type($translation_id, "text");
         $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
         $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
         $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
@@ -40,8 +41,8 @@ class Vote extends CI_Controller {
             $data['project_video_id'] = $project->video_id;
             $data['project_description'] = $project->project_description;
             $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project->id)->result();
-//            $data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
-            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['translation_type'] = "text";
             $this->load->view("public/public_vote", $data);
         }
         else

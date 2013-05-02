@@ -29,7 +29,7 @@
             <!-- reCaptcha CODE -->
             <input type="button" class="btn btn-danger" value="Cancel" onclick="history.back()"/>
             <div class="pull-right">
-                <input id="draft" type="button" class="btn btn-info" value="Save to draft"/>
+                <input id="draft" type="button" class="btn btn-info" value="<?php if(isset($draft_id)) echo 'Update draft'; else echo 'Save to draft'; ?>"/>
                 <input type="submit" class="btn btn-primary" value="Translate"/>
             </div>
         </form>

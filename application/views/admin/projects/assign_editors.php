@@ -4,7 +4,7 @@
 <body>
 <div class="container round-border">
     <h3 style="margin-left:20px">
-    	Assign tasks to editors for "<?php echo $translation[0]->project_name; ?>"
+    	Assign tasks to editors for "<?php echo $project[0]->project_name; ?>"
 	</h3><hr/>
     <div style="margin:20px;">
         <table class="table table-hover datatable">
@@ -40,7 +40,7 @@
                                 </span>
                             </a>
                             <a style="cursor: pointer; <?php if(!empty($editor_username[$index][0])){?> display: none; <?php } ?>"
-                               class="temp-link" id="save_<?php echo $task->id; ?>" onclick="update_editor_ajax(<?php echo $task->id; ?>);">
+                               class="temp-link" id="save_<?php echo $task->id; ?>" onclick="update_editor_ajax('<?php echo $task->id; ?>');">
                                 <span class="badge badge-info">
                                         <i class="icon-ok icon-white"></i> Save
                                 </span>
@@ -76,6 +76,7 @@
         $('#save_' + id).show();
         //update_editor_ajax(id); //This option automatically set null editor when click edit
     }
+
     function update_editor_ajax(id){
         var editor_name_tag = $('#tag_input' + id).tokenInput("get")[0];
         if(editor_name_tag == undefined)
@@ -86,7 +87,7 @@
         $.post('<?php echo base_url("admin/projects/assign_editors_ajax") ?>', {
             task_id: id,
             editor: editor_name,
-            project_id: '<?php echo $translation[0]->id; ?>'
+            project_id: '<?php echo $project[0]->id; ?>'
         }).done(function(data){
             var response = $.parseJSON(data);
             if(response.msg == "true"){
