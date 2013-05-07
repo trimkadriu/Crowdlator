@@ -23,7 +23,7 @@ class Projects_model extends CI_Model {
 			'break_text' => $break_text,
 			'hash_tags' => $hashtags,
 			'create_date' => date('Y-m-d H:i:s'),
-			'status' => 'In progress'
+			'status' => 'In translation'
 		);
 		$this->db->insert('projects', $data);
 		$this->db->trans_complete();
@@ -69,9 +69,32 @@ class Projects_model extends CI_Model {
 
     function select_projects()
     {
-        //Check if PROJECT exists by ID
         $this->db->select('*');
         $this->db->from('projects');
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
+
+    function get_project_by_params($id = null, $admin_id = null, $project_name = null, $video_id = null,
+                                    $create_date = null, $status = null)
+    {
+        $this->db->select('*');
+        $this->db->from('projects');
+        if($id)
+            $this->db->where("id", $id);
+        if($admin_id)
+            $this->db->where("admin_id", $admin_id);
+        if($project_name)
+            $this->db->where("project_name", $project_name);
+        if($video_id)
+            $this->db->where("video_id", $video_id);
+        if($create_date)
+            $this->db->where("create_date", $create_date);
+        if($status)
+            $this->db->where("status", $status);
         $query = $this->db->get();
         if($query->num_rows() == 0)
             return false;
@@ -133,6 +156,40 @@ class Projects_model extends CI_Model {
         $this->db->update('projects', $data);
         $this->db->trans_complete();
         $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
+    function update_project_status($project_id, $status, $user_id = null)
+    {
+        $this->db->trans_start();
+        $data = array(
+            'status' => $status
+        );
+        $this->db->where('id', $project_id);
+        if($user_id)
+            $this->db->where('admin_id', $user_id);
+        $this->db->update('projects', $data);
+        $this->db->trans_complete();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
+    function update_project_translated_text($project_id, $text, $user_id = null)
+    {
+        $this->db->trans_start();
+        $data = array(
+            'translated_text' => $text
+        );
+        $this->db->where('id', $project_id);
+        if($user_id)
+            $this->db->where('admin_id', $user_id);
+        $this->db->update('projects', $data);
+        $this->db->trans_complete();
         if($this->db->trans_status() === TRUE)
             return true;
         else

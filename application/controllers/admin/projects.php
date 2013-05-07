@@ -190,7 +190,6 @@ class Projects extends CI_Controller {
 		//Check permissions
 		if(!check_permissions(get_session_roleid(), 'admin/projects/assign_editors'))
 			redirect("pages/permission_exception");
-
         $temp = func_get_args(0);
         if($temp)
             $project_id = $temp[0];
@@ -209,6 +208,12 @@ class Projects extends CI_Controller {
             redirect('admin/user/dashboard');
         }
         $data['project'] = $this->projects_model->select_project_by_id($project_id)->result();
+        if($data['project'][0]->status != "In Translation")
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This project status is not in translation.');
+            redirect('admin/user/dashboard');
+        }
         $data['tasks'] = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
         for($i = 0; $i <= sizeof($data['tasks']) - 1; $i++)
         {
@@ -229,13 +234,16 @@ class Projects extends CI_Controller {
         if($user_role == "administrator")
         {
             $data['projects'] = $this->projects_model->select_project_by_user(get_session_username());
-            $this->load->view('admin/projects/list_projects', $data);
         }
         if($user_role == "translator")
         {
             $data['projects'] = $this->projects_model->select_projects();
-            $this->load->view('admin/projects/list_projects', $data);
+            /*foreach($data['projects'] as $key=>$project)
+            {
+                $data['project_status'][$key] = check_project_status($project->id);
+            }*/
         }
+        $this->load->view('admin/projects/list_projects', $data);
 	}
 
     public function delete_project()
@@ -416,17 +424,22 @@ class Projects extends CI_Controller {
         //Check permissions
         if(!check_permissions(get_session_roleid(), 'admin/projects/list_tasks'))
             redirect("pages/permission_exception");
-        $data['tasks'] = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
-        if($data['tasks'])
+        $tasks = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
+        if($tasks)
         {
-            for($i = 0; $i < sizeof($data['tasks']); $i++)
+            for($i = 0; $i < sizeof($tasks); $i++)
             {
-                $project_id = $data['tasks'][$i]->project_id;
-                $task_id = $data['tasks'][$i]->id;
-                $temp = $this->translations_model->count_translations($task_id);
-                $data['count'][$i] = $temp[0]->nr;
-                $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
-                $data['projectname'][$i] = $temp1[0]->project_name;
+                $project_id = $tasks[$i]->project_id;
+                $project = $this->projects_model->select_project_by_id($project_id)->result();
+                if($project[0]->status == "In Translation")
+                {
+                    $data['tasks'][$i] = $tasks[$i];
+                    $data['projectname'][$i] = $project[0]->project_name;
+                    $data['date_created'][$i] = $project[0]->create_date;
+                    $task_id = $data['tasks'][$i]->id;
+                    $temp = $this->translations_model->count_translations($task_id);
+                    $data['count'][$i] = $temp[0]->nr;
+                }
             }
         }
         $this->load->view('admin/projects/list_tasks', $data);
@@ -440,6 +453,38 @@ class Projects extends CI_Controller {
         $data['youtube_response'] = $this->youtube_model->get_upload_token();
         $data['next_url'] = $this->config->item("youtube_next_url");
         echo json_encode($data);
+    }
+
+    function projects_status()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/projects/projects_status'))
+            redirect("pages/permission_exception");
+        $role = get_user_role();
+        $projects = false;
+        if($role == "administrator")
+        {
+            $projects = $this->projects_model->get_project_by_params(null, get_session_user_id(), null, null, null, null);
+        }
+        elseif($role == "super editor")
+        {
+            $projects = $this->projects_model->select_projects();
+        }
+        //Create model and return to view
+        if($projects)
+        {
+            $data['projects_nr'] = sizeof($projects);
+            foreach($projects as $key=>$project)
+            {
+                $data['project_name'][$key] = $project->project_name;
+                $data['project_description'][$key] = $project->project_description;
+                $data['date_created'][$key] = $project->create_date;
+                $data['translate_from'][$key] = $project->translate_from_language;
+                $data['translate_to'][$key] = $project->translate_to_language;
+                $data['status'][$key] = $project->status;
+                $data['video_id'][$key] = $project->video_id;
+            }
+        }
+        $this->load->view("admin/projects/projects_status", $data);
     }
 }
 

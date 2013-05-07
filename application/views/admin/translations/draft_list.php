@@ -60,6 +60,7 @@
     $(document).ready(function() {
         $("[rel=tooltip]").tooltip();
         $("th#date").click().click();
+        $(".datatable thead tr th:nth-child(2)").click().click();
     });
 
     function prepare_delete_confirm(draft_id) {

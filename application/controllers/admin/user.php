@@ -1,4 +1,3 @@
-
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class User extends CI_Controller {
@@ -85,7 +84,7 @@ class User extends CI_Controller {
 		redirect('pages/home');
 	}
 
-    public function get_administrator_data()
+    private function get_administrator_data()
     {
         $data['editors'] = $this->editors_model->getThreeRandomEditors();
         $data['projects'] = $this->projects_model->get_latest_projects(5, get_session_user_id());
@@ -99,78 +98,75 @@ class User extends CI_Controller {
             base_url('admin/projects/list_projects'));
         $data['left2'] = array('Vote the best translation', '<i class="icon-thumbs-up"></i>',
             base_url('admin/translate/vote_translations'));
-        $data['right1'] = array('Share translations in social networks', '<i class="icon-share" style="margin-top:8px;"></i>',
+        $data['right1'] = array('See statuses of your projects', '<i class="icon-info-sign" style="margin-top:8px;"></i>',
+            base_url('admin/projects/projects_status'));
+        $data['right2'] = array('Share translations in social networks', '<i class="icon-share"></i>',
             base_url('admin/projects/list_projects'));
-        /*$data['right1'] = array('Add profile picture in user settings', '<i class="icon-picture" style="margin-top:8px;"></i>',
-            base_url('admin/settings/account_settings'));*/
-        $data['right2'] = array('', '', '');
         return $data;
     }
 
-    public function get_editor_data()
+    private function get_editor_data()
     {
-        $data['tasks'] = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
+        $tasks = $this->tasks_model->get_tasks_by_editor(get_session_user_id(), 5);
         $data['translations'] = false;
-        $data['offset'] = 5;
-        if(sizeof($data['tasks']) < $data['offset'])
-            $data['limit'] = sizeof($data['tasks']);
-        else
-            $data['limit'] = $data['offset'];
-        if($data['tasks']){
+        if($tasks){
             // Latest tasks
-            for($i = 0; $i < sizeof($data['tasks']); $i++)
+            $ids = array();
+            for($i = 0; $i < sizeof($tasks); $i++)
             {
-                if($i > $data['limit']) break;
-                $project_id = $data['tasks'][$i]->project_id;
-                $temp_proj = $this->projects_model->select_project_by_id($project_id)->result();
+                $temp_proj = $this->projects_model->select_project_by_id($tasks[$i]->project_id)->result();
                 $project = $temp_proj[0];
-                $data['projectname'][$i] = $project->project_name;
-                $data['date'][$i] = $project->create_date;
-                $data['from'][$i] = $project->translate_from_language;
-                $data['to'][$i] = $project->translate_to_language;
-                $data['type'][$i] = $data['tasks'][$i]->type;
+                if($project->status == "In Translation")
+                {
+                    $ids[$i] = $tasks[$i]->id;
+                    $data['tasks'][$i] = $tasks[$i];
+                    $data['projectname'][$i] = $project->project_name;
+                    $data['date'][$i] = $project->create_date;
+                    $data['from'][$i] = $project->translate_from_language;
+                    $data['to'][$i] = $project->translate_to_language;
+                }
             }
             // Latest translations
-            $ids = array();
-            for($i = 0; $i < sizeof($data['tasks']); $i++)
-            {
-                $ids[$i] = $data['tasks'][$i]->id;
-            }
             if(sizeof($ids) > 0)
             {
-                $data['translations'] = $this->translations_model->get_translations_by_task_ids($ids, $data['offset']);
+                $data['translations'] = $this->translations_model->get_translations_by_task_ids($ids, 5);
             }
         }
         // START data for Forehead Message
         $data['title1'] = 'Get started:';
         $data['title2'] = 'Next steps:';
-        $data['title3'] = '';
+        $data['title3'] = 'More action';
         $data['button'] = array('Vote translations', base_url("admin/translate/vote_translations"));
         $data['left1'] = array('List your tasks', '<i class="icon-list" style="margin-top:5px;"></i>',
             base_url('admin/projects/list_tasks'));
         $data['left2'] = array('Ask help for translation', '<i class="icon-share"></i>',
             base_url('admin/projects/list_tasks'));
-        $data['right1'] = array('', '', '');
-        $data['right2'] = array('', '', '');
+        $data['right1'] = array('Vote the best audios', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
+            base_url('admin/translate/vote_translations/1'));
+        $data['right2'] = array('List my translated tasks', '<i class="icon-tasks"></i>',
+            base_url('admin/translate/translations'));
         return $data;
     }
 
-    public function get_super_editor_data()
+    private function get_super_editor_data()
     {
         // START data for Forehead Message
         $data['title1'] = 'Get started:';
-        $data['title2'] = '';
-        $data['title3'] = '';
+        $data['title2'] = 'Next steps';
+        $data['title3'] = 'More action';
         $data['button'] = array('Choose best translations', base_url("admin/translate/choose_translations"));
         $data['left1'] = array('Vote the best translation', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
             base_url('admin/translate/vote_translations'));
-        $data['left2'] = array('', '', '');
-        $data['right1'] = array('', '', '');
-        $data['right2'] = array('', '', '');
+        $data['left2'] = array('See projects statuses', '<i class="icon-info-sign"></i>',
+            base_url('admin/projects/projects_status'));
+        $data['right1'] = array('Vote the best audios', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
+            base_url('admin/translate/vote_translations/1'));
+        $data['right2'] = array('Choose best audios', '<i class="icon-check"></i>',
+            base_url("admin/translate/choose_translations/1"));
         return $data;
     }
 
-    public function get_translator_data()
+    private function get_translator_data()
     {
         //My drafts component
         $data['drafts'] = $this->drafts_model->get_drafts_by_user_id(get_session_user_id(), 5);
@@ -194,14 +190,16 @@ class User extends CI_Controller {
         // START data for Forehead Message
         $data['title1'] = 'Get started:';
         $data['title2'] = 'Next steps:';
-        $data['title3'] = '';
+        $data['title3'] = 'More action';
         $data['button'] = array('Translate some tasks', base_url('admin/projects/list_projects'));
         $data['left1'] = array('Vote the best translation', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
             base_url('admin/translate/vote_translations'));
         $data['left2'] = array('Share translations in social networks', '<i class="icon-share"></i>',
             base_url('admin/projects/list_projects'));
-        $data['right1'] = array('', '', '');
-        $data['right2'] = array('', '', '');
+        $data['right1'] = array('Vote the best audios', '<i class="icon-thumbs-up" style="margin-top:8px;"></i>',
+            base_url('admin/translate/vote_translations/1'));
+        $data['right2'] = array('View my draft list', '<i class="icon-th-list"></i>',
+            base_url('admin/translate/draft_list'));
         return $data;
     }
 }

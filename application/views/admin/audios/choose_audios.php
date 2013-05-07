@@ -25,9 +25,9 @@
             </tr>
             </thead>
             <tbody>
-            <?php if($translation_nr > 0) { for($i = 0; $i < $translation_nr; $i++) { ?>
+            <?php if($audios_nr > 0) { for($i = 0; $i < $audios_nr; $i++) { ?>
             <tr>
-                <td><?php echo $project_name[$i]; ?><br/><?php echo $date_translated[$i]; ?></td>
+                <td><?php echo $project_name[$i]; ?><br/><?php echo $date_recorded[$i]; ?></td>
                 <td><?php echo $translate_from[$i]; ?></td>
                 <td><?php echo $translate_to[$i]; ?></td>
                 <td style="text-align: center">
@@ -39,7 +39,7 @@
                     <ul class="nav nav-pills">
                         <li>
                             <a style="cursor: pointer;" href="#choose_modal" data-toggle="modal"
-                               onclick="prepare_choose_modal('<?php echo $translation_id[$i]; ?>')">
+                               onclick="prepare_choose_modal('<?php echo $id[$i]; ?>')">
                                 Choose Translation
                             </a>
                         </li>
@@ -47,14 +47,13 @@
                 </td>
                 <td style="text-align: left">
                     <?php
-                        $original_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $text[$i]));
                         $translated_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $translated[$i]));
                         $from = $translate_from[$i];
                         $to = $translate_to[$i];
                     ?>
                     <a rel="tooltip" data-placement="top" data-original-title="Review this translation"
-                       data-toggle="modal" href="#review_modal" onclick="prepare_review_modal('<?php echo $original_text; ?>',
-                            '<?php echo $translated_text; ?>', '<?php echo $translation_id[$i]; ?>', '<?php echo $from; ?>', '<?php echo $to; ?>');">
+                       data-toggle="modal" href="#review_modal" onclick="prepare_review_modal('<?php echo $translated_text; ?>',
+                            '<?php echo $audio_id[$i]; ?>', '<?php echo $from; ?>', '<?php echo $to; ?>');">
                         <i class="icon-check"></i> Review
                     </a><br/>
                     <a onclick="prepare_video_modal('<?php echo $project_video_id[$i]; ?>', '<?php echo $project_name[$i]; ?>', $('#description_<?php echo $i; ?>').val());"
@@ -97,10 +96,10 @@
         <h3>Review</h3>
     </div>
     <div class="modal-body">
-            <strong>Translation from <span id="vote_modal_from"></span>:</strong><br/>
-            <textarea id="vote_modal_text" disabled="disabled" class="translate_text"></textarea><br/><br/>
-            <strong>Translated to <span id="vote_modal_to"></span>:</strong><br/>
+            <strong>Translated from <span id="vote_modal_from"></span> to <span class="vote_modal_to"></span>:</strong><br/>
             <textarea id="vote_modal_translated" disabled="disabled" class="translate_text"></textarea>
+            <strong>Audio recorded in <span class="vote_modal_to"></span>:</strong><br/>
+            <iframe id="soundcloud_player" width="100%" height="166" scrolling="no" frameborder="no" src=""></iframe>
     </div>
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">Close</a>
@@ -126,15 +125,16 @@
         $("#description").text(project_description);
     }
 
-    function prepare_review_modal(text, translated, id, from, to) {
-        $("#vote_modal_text").val(text);
+    function prepare_review_modal(translated, audio_id, from, to) {
         $("#vote_modal_translated").val(translated);
         $("#vote_modal_from").val(from);
-        $("#vote_modal_to").val(to);
+        $(".vote_modal_to").val(to);
+        url = "https://w.soundcloud.com/player/?url=http://api.soundcloud.com/tracks/" + audio_id + "&color=ff6600&auto_play=false&show_artwork=false";
+        $("#soundcloud_player").attr("src", url);
     }
 
     function prepare_choose_modal(id) {
-        $("#choose_confirm").attr("href", "<?php echo base_url('admin/translate/chose_translation'); ?>/" + id);
+        $("#choose_confirm").attr("href", "<?php echo base_url('admin/translate/choose_audio'); ?>/" + id);
     }
 
     $(document).ready(function() {

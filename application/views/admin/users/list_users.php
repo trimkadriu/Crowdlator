@@ -8,19 +8,22 @@
         <table class="table table-hover datatable">
             <thead>
             <tr>
-                <th style="width:10%;">User ID</th>
-                <th>Full name</th>
+                <!--<th style="width:10%;">User ID</th>-->
+                <th>Full name<br/>Date created</th>
                 <th>Country</th>
                 <th>E-mail</th>
                 <th>Role</th>
-                <th style="width: 10%; text-align: center">Action</th>
+                <th style="width: 15%; text-align: center">Action</th>
             </tr>
             </thead>
             <tbody>
             <?php if($users != null) { $index = 0; foreach($users as $user) { ?>
             <tr>
-                <td><?php echo $user->id; ?></td>
-                <td id="user_fullname"><?php echo $user->fullname; ?></td>
+                <!--<td><?php /*echo $user->id; */?></td>-->
+                <td id="user_fullname">
+                    <span style="display: none;"><?php echo $user->date_created; ?></span>
+                    <?php echo $user->fullname; ?><br/><?php echo $user->date_created; ?>
+                </td>
                 <td><?php echo $user->country; ?></td>
                 <td id="user_email"><?php echo $user->email; ?></td>
                 <td id="user_rolename"><?php echo ucfirst($user->rolename); ?></td>
@@ -28,7 +31,7 @@
                     <a href="#change_role_modal"
                        onclick="set_values($(this).parent().parent().find('#user_fullname').text(), $(this).parent().parent().find('#user_rolename').text(), $(this).parent().parent().find('#user_email').text())"
                        rel="tooltip" data-placement="top" data-original-title="Change user role" data-toggle="modal">
-                        <i class="icon-edit"></i>
+                        <i class="icon-edit"></i> Change role
                     </a>
                 </td>
             </tr>
@@ -87,4 +90,9 @@
     });
 </script>
 <?php $this->load->view('_inc/datatables'); ?>
+<script>
+    $(document).ready(function() {
+        $(".datatable thead tr th:nth-child(1)").click();
+    });
+</script>
 <?php $this->load->view('_inc/footer_base'); ?>

@@ -101,6 +101,32 @@ class Translations_model extends CI_Model {
             return $query->result();
     }
 
+    function get_translation_by_params($id = null, $task_id = null, $user_id = null, $date_created = null,
+                                       $reviewed = null, $approved = null, $choosen = null)
+    {
+        $this->db->select('*');
+        $this->db->from('translations');
+        if($id)
+            $this->db->where('id', $id);
+        if($task_id)
+            $this->db->where('task_id', $task_id);
+        if($user_id)
+            $this->db->where('user_id', $user_id);
+        if($date_created)
+            $this->db->where('date_created', $date_created);
+        if($reviewed)
+            $this->db->where('reviewed', $reviewed);
+        if($approved)
+            $this->db->where('approved', $approved);
+        if($choosen)
+            $this->db->where('choosen', $choosen);
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
+
     function check_translation_by_task_id($task_id)
     {
         $this->db->select('*');
@@ -114,10 +140,24 @@ class Translations_model extends CI_Model {
             return $query->result();
     }
 
-    function delete_translation_by_id($translation_id)
+    function delete_translation_by_id($translation_id = null, $task_id = null, $user_id = null, $date_created = null,
+                                      $reviewed = null, $approved = null, $choosen = null)
     {
         $this->db->trans_start();
-        $this->db->where('id', $translation_id);
+        if($translation_id)
+            $this->db->where('id', $translation_id);
+        if($task_id)
+            $this->db->where('task_id', $task_id);
+        if($user_id)
+            $this->db->where('user_id', $user_id);
+        if($date_created)
+            $this->db->where('date_created', $date_created);
+        if($reviewed)
+            $this->db->where('reviewed', $reviewed);
+        if($approved)
+            $this->db->where('approved', $approved);
+        if($choosen)
+            $this->db->where('choosen', $choosen);
         $this->db->delete('translations');
         $this->db->trans_complete();
         $log = $this->db->last_query();
@@ -210,9 +250,9 @@ class Translations_model extends CI_Model {
 
     function get_all_translations_where_choosen_not($choosen)
     {
-        $sql = "SELECT * FROM `translations` WHERE task_id NOT IN (SELECT task_id FROM `translations` WHERE choosen = ".$choosen.");";
+        $sql = "SELECT * FROM `translations` WHERE approved = 1 AND task_id NOT IN (SELECT task_id FROM `translations` WHERE choosen = " . $choosen . ");";
         $query = $this->db->query($sql);
-        if($query->num_rows() == 0)
+        if ($query->num_rows() == 0)
             return false;
         else
             return $query->result();

@@ -125,9 +125,49 @@ function get_if_voted_by_id_type($id, $type)
     {
         $CI =& get_instance();
         $CI->session->set_flashdata('message_type', 'error');
-        $CI->session->set_flashdata('message', 'You have already voted in this translation.');
+        $CI->session->set_flashdata('message', 'You have already voted in this.');
         redirect('pages/home/');
     }
+}
+
+function generateRandomString($length = 10)
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    return $randomString;
+}
+
+function check_project_status($project_id)
+{
+    $CI =& get_instance();
+    $CI->load->model("tasks_model");
+    $CI->load->model("translations_model");
+    $tasks = $CI->tasks_model->get_tasks_by_project_id($project_id)->result();
+    $success = 0;
+    $status = false;
+    for($i = 0; $i < sizeof($tasks); $i++)
+    {
+        $translations = $CI->translations_model->check_translation_by_task_id($tasks[$i]->id);
+        if($translations)
+        {
+            for($j = 0; $j < sizeof($translations); $j++)
+            {
+                if($translations[$j]->choosen == 1)
+                {
+                    $success++;
+                    break;
+                }
+            }
+        }
+        else
+            break;
+    }
+    if($success == sizeof($tasks))
+        $status = true;
+    return $status;
 }
 
 function get_html_country_dropdown_list()

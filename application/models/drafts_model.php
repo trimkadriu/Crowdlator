@@ -53,12 +53,14 @@ class Drafts_model extends CI_Model {
             return $query->result();
     }
 
-    function delete_draft_by_id($id, $user_id = null)
+    function delete_draft_by_id($id = null, $user_id = null, $task_id = null)
     {
         $this->db->trans_start();
         $this->db->where('id', $id);
         if($user_id)
             $this->db->where('user_id', $user_id);
+        if($task_id)
+            $this->db->where('task_id', $task_id);
         $this->db->delete('drafts');
         $this->db->trans_complete();
         $log = $this->db->last_query();

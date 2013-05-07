@@ -8,48 +8,59 @@
         <table class="table table-hover datatable">
             <thead>
                 <tr>
-                    <th style="width:5%;">ID</th>
-                    <th style="width:20%;">Name</th>
-                    <th style="width:35%;">Description</th>
+                    <!--<th style="width:5%;">ID</th>-->
+                    <th style="width:20%;">Name<br/>Date created</th>
+                    <th style="width:30%;">Description</th>
                     <th style="width:15%;">From</th>
                     <th style="width:15%;">To</th>
-                    <th style="width:10%; text-align: center">Actions</th>
+                    <th style="width:20%; text-align: center">Actions</th>
                 </tr>
             </thead>
             <tbody>
             <?php if($projects != null) { $index = 0; foreach($projects as $project) { ?>
+                <?php if(get_user_role() == "translator" && $project->status != "In Translation"); else{ ?>
                 <tr id="<?php echo $project->id; ?>">
-                    <td><?php echo $project->id; ?></td>
-                    <td><?php echo $project->project_name; ?></td>
+                    <!--<td><?php /*echo $project->id; */?></td>-->
+                    <td>
+                        <span style="display: none"><?php echo $project->create_date; ?></span>
+                        <?php echo $project->project_name; ?><br/><?php echo $project->create_date; ?>
+                    </td>
                     <td><?php echo $project->project_description; ?></td>
                     <td><?php echo $project->translate_from_language; ?></td>
                     <td><?php echo $project->translate_to_language; ?></td>
-                    <td style="text-align: center">
+                    <td style="text-align: left">
                         <?php if(check_permissions(get_session_roleid(), 'admin/projects/edit_project')) { ?>
                             <a href="<?php echo base_url('admin/projects/edit_project/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="Edit project details">
-                            <i class="icon-edit"></i></a>
+                            <i class="icon-edit"></i> Edit details</a><br/>
                         <?php } ?>
-                        <?php if(check_permissions(get_session_roleid(), 'admin/projects/assign_editors')) { ?>
+                        <?php if(check_permissions(get_session_roleid(), 'admin/projects/assign_editors') && $project->status == "In Translation") { ?>
                             <a href="<?php echo base_url('admin/projects/assign_editors/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="Assign editors to project tasks">
-                            <i class="icon-tasks"></i></a>
+                            <i class="icon-tasks"></i> Assign editors</a><br/>
                         <?php } ?>
                         <?php if(check_permissions(get_session_roleid(), 'admin/projects/delete_project')) { ?>
                             <a onclick="delete_confirm(<?php echo $project->id.', \''.$project->project_name.'\''; ?>);"
                                href="#confirm_delete_modal" rel="tooltip" data-placement="top" data-original-title="Delete project"
                                data-toggle="modal">
-                            <i class="icon-remove"></i></a>
+                            <i class="icon-remove"></i> Delete project</a><br/>
                         <?php } ?>
-                        <?php if(check_permissions(get_session_roleid(), 'admin/projects/tasks_list')) { ?>
-                            <a href="<?php echo base_url('admin/projects/tasks_list/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="List project tasks">
-                            <i class="icon-th-list"></i></a>
+                        <?php if($project->status == "In Audition") { ?>
+                            <?php if(check_permissions(get_session_roleid(), 'admin/translate/audio_audition')) { ?>
+                            <a href="<?php echo base_url('admin/translate/audio_audition/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="Record audio">
+                                <img src="<?php echo base_url("template/img/extra_icons/glyphicons_300_microphone.png"); ?>"
+                                        style="height: 13px; width: 8px;"/> Record audio</a><br/>
+                        <?php } } elseif($project->status == "In Translation") { ?>
+                            <?php if(check_permissions(get_session_roleid(), 'admin/projects/tasks_list')) { ?>
+                                <a href="<?php echo base_url('admin/projects/tasks_list/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="List project tasks">
+                                <i class="icon-th-list"></i> View tasks</a><br/>
+                            <?php } ?>
                         <?php } ?>
                         <a onclick="prepare_video_modal('<?php echo $project->video_id; ?>', '<?php echo $project->project_name; ?>');"
                            href="#video_modal" rel="tooltip" data-placement="top" data-original-title="Open video of this project."
                            data-toggle="modal">
-                            <i class="icon-film"></i></a>
+                            <i class="icon-film"></i> Watch video</a>
                     </td>
                 </tr>
-                <?php $index++; } } else {?>
+                <?php } $index++; } } else {?>
                 <tr><td colspan="6">No projects found.</td></tr>
                 <?php } ?>
             </tbody>
@@ -95,9 +106,12 @@
         });
     </script>
 <?php } ?>
+<?php $this->load->view('_inc/datatables'); ?>
 <script>
     $(document).ready(function() {
         $("[rel=tooltip]").tooltip();
+
+        $(".datatable thead tr th:nth-child(1)").click();
     });
 
     function prepare_video_modal(video_id, project_name) {
@@ -105,5 +119,4 @@
         $("#video_modal_title").text("Video of '" + project_name + "'");
     }
 </script>
-<?php $this->load->view('_inc/datatables'); ?>
 <?php $this->load->view('_inc/footer_base'); ?>

@@ -9,26 +9,27 @@
             <thead>
                 <tr>
                     <th style="width:7%;text-align: center;">ID</th>
-                    <th style="width:20%;">Project name</th>
+                    <th style="width:20%;">Project name<br/>Date created</th>
                     <th style="width:48%;">Text</th>
                     <th style="width:15%; text-align: center;">Translations</th>
                     <th style="width:10%; text-align: center;">Action</th>
                 </tr>
             </thead>
             <tbody>
-                <?php $index = 0; if($tasks) { foreach($tasks as $task) { ?>
+                <?php if($tasks) { foreach($tasks as $i=>$task) { ?>
                 <tr id="<?php echo $task->id; ?>">
                     <td style="text-align: center;">
                         <?php echo $task->id; ?>
                     </td>
                     <td>
-                        <?php echo $projectname[$index]; ?>
+                        <span style="display: none;"><?php echo $date_created[$i]; ?></span>
+                        <?php echo $projectname[$i]; ?><br/><?php echo $date_created[$i]; ?>
                     </td>
                     <td>
                         <?php echo $task->text; ?>
                     </td>
                     <td style="text-align: center;">
-                        <?php echo $count[$index]; ?>
+                        <?php echo $count[$i]; ?>
                     </td>
                     <td style="text-align: center;">
                         <a href="#" rel="tooltip" data-placement="top" data-original-title="Ask for help on Facebook" onclick="facebook_share()">
@@ -43,7 +44,7 @@
                         </a>
                     </td>
                 </tr>
-                <?php $index++; } } ?>
+                <?php } } ?>
             </tbody>
         </table>
     </div>
@@ -65,4 +66,9 @@
     }
 </script>
 <?php $this->load->view('_inc/datatables'); ?>
+<script>
+    $(document).ready(function() {
+        $(".datatable thead tr th:nth-child(2)").click().click();
+    });
+</script>
 <?php $this->load->view('_inc/footer_base'); ?>

@@ -84,11 +84,13 @@ class Tasks_model extends CI_Model {
             return false;
     }
 
-    function get_tasks_by_editor($editor_id)
+    function get_tasks_by_editor($editor_id, $limit = null)
     {
         $this->db->select('*');
         $this->db->from('tasks');
         $this->db->where('editor_id', $editor_id);
+        if($limit)
+            $this->db->limit($limit);
         $this->db->order_by('id', 'DESC');
         $query = $this->db->get();
         if($query->num_rows() == 0)

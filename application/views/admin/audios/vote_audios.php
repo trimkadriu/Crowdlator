@@ -16,7 +16,7 @@
         <table class="table table-hover datatable">
             <thead>
             <tr>
-                <th style="width:20%;">Project name<br/>Date translated</th>
+                <th style="width:20%;">Project name<br/>Date recorded</th>
                 <th style="width:15%;">From</th>
                 <th style="width:15%;">To</th>
                 <th style="width:8%; text-align: center;">Voted</th>
@@ -25,9 +25,9 @@
             </tr>
             </thead>
             <tbody>
-            <?php if($translation_nr > 0) { for($i = 0; $i < $translation_nr; $i++) { ?>
+            <?php if($audios_nr > 0) { for($i = 0; $i < $audios_nr; $i++) { ?>
             <tr>
-                <td><?php echo $project_name[$i]; ?><br/><?php echo $date_translated[$i]; ?></td>
+                <td><?php echo $project_name[$i]; ?><br/><?php echo $date_created[$i]; ?></td>
                 <td><?php echo $translate_from[$i]; ?></td>
                 <td><?php echo $translate_to[$i]; ?></td>
                 <td style="text-align: center">
@@ -41,15 +41,15 @@
                 </td>
                 <td style="text-align: left">
                     <?php
-                        $original_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $text[$i]));
-                        $translated_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $translated[$i]));
+                        $original_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $translated[$i]));
+                        $translated_text = strip_quotes(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $audio_id[$i]));
                         $from = $translate_from[$i];
                         $to = $translate_to[$i];
                         if(!$voted[$i]){
                     ?>
                     <a rel="tooltip" data-placement="top" data-original-title="Review & Vote on this translation"
                        data-toggle="modal" href="#vote_modal" onclick="prepare_vote_modal('<?php echo $original_text; ?>',
-                            '<?php echo $translated_text; ?>', '<?php echo $translation_id[$i]; ?>', '<?php echo $from; ?>', '<?php echo $to; ?>');">
+                            '<?php echo $id[$i]; ?>', '<?php echo $from; ?>', '<?php echo $to; ?>', '<?php echo $audio_id[$i]; ?>');">
                         <i class="icon-check"></i> Review & Vote
                     </a><br/>
                     <?php } ?>
@@ -61,13 +61,13 @@
                         <?php echo strip_quotes(strip_slashes(trim($project_description[$i]))); ?>
                     </textarea><br/>
                     <span rel="tooltip" data-placement="top" data-original-title="Ask to vote by sharing it on Facebook.">
-                        <a href="#" onclick="facebook_share('<?php echo $translation_id[$i]; ?>')">
+                        <a href="#" onclick="facebook_share('<?php echo $project_id[$i]; ?>')">
                             <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
                                  style="width: 13px; height: 13px"/> Facebook
                         </a>
                     </span><br/>
                     <span rel="tooltip" data-placement="top" data-original-title="Ask to vote by sharing it on Twitter.">
-                        <a href="#" onclick="twitter_share('<?php echo $translation_id[$i]; ?>')">
+                        <a href="#" onclick="twitter_share('<?php echo $project_id[$i]; ?>')">
                             <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
                                  style="width: 13px; height: 13px"/> Twitter
                         </a>
@@ -106,10 +106,10 @@
     </div>
     <div class="modal-body">
         <form id="vote_modal_form" action="<?php echo base_url('admin/translate/vote'); ?>" method="post">
-            <strong>Translation from <span id="vote_modal_from"></span>:</strong><br/>
+            <strong>Translated from <span id="vote_modal_from"></span> to <span class="vote_modal_to"></span>:</strong><br/>
             <textarea id="vote_modal_text" disabled="disabled" class="translate_text"></textarea><br/><br/>
-            <strong>Translated to <span id="vote_modal_to"></span>:</strong><br/>
-            <textarea id="vote_modal_translated" disabled="disabled" class="translate_text"></textarea>
+            <strong>Audio recorded in <span class="vote_modal_to"></span>:</strong>
+            <iframe id="soundcloud_player" width="100%" height="166" scrolling="no" frameborder="no" src=""></iframe>
             <input id="vote_modal_translation_id" type="hidden" name="id"/>
             <input type="hidden" name="translation_type" value="<?php echo $translation_type; ?>">
             <input id="vote_modal_vote_type" type="hidden" name="vote_type">
@@ -134,22 +134,23 @@
         $("#description").text(project_description);
     }
 
-    function prepare_vote_modal(text, translated, id, from, to) {
+    function prepare_vote_modal(text, id, from, to, audio_id) {
         $("#vote_modal_text").val(text);
-        $("#vote_modal_translated").val(translated);
         $("#vote_modal_translation_id").val(id);
         $("#vote_modal_from").val(from);
         $("#vote_modal_to").val(to);
+        url = "https://w.soundcloud.com/player/?url=http://api.soundcloud.com/tracks/" + audio_id + "&color=ff6600&auto_play=false&show_artwork=false";
+        $("#soundcloud_player").attr("src", url);
     }
 
     function facebook_share(id) {
-        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('<?php echo base_url("public/vote/translation")."/"; ?>' + id),
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('<?php echo base_url("public/vote/audio")."/"; ?>' + id),
                 '', 'width=600,height=300');
     }
 
     function twitter_share(id) {
         window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation ') +
-                encodeURIComponent('<?php echo base_url("public/vote/translation")."/"; ?>' + id),
+                encodeURIComponent('<?php echo base_url("public/vote/audio")."/"; ?>' + id),
                 '', 'width=600,height=300');
     }
 </script>
