@@ -137,6 +137,15 @@ class Youtube_model extends CI_Model {
             return $response;
     }
 
+    function get_video_details($video_id)
+    {
+        $data=@file_get_contents('http://gdata.youtube.com/feeds/api/videos/'.$video_id.'?v=2&alt=jsonc');
+        if (false===$data)
+            return false;
+        $obj=json_decode($data);
+        return $obj;
+    }
+
 }
 
 ?>

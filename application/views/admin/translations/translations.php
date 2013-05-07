@@ -25,7 +25,6 @@
         <table class="table table-hover datatable">
             <thead>
             <tr>
-                <!--<th style="width:5%;">Task ID</th>-->
                 <th style="width:20%;">Project name</th>
                 <th style="width:17%;">Date translated</th>
                 <th style="width:15%;">From</th>
@@ -182,4 +181,9 @@
     });
 </script>
 <?php $this->load->view('_inc/datatables'); ?>
+<script>
+    $(document).ready(function() {
+        $(".datatable thead tr th:nth-child(2)").click().click();
+    });
+</script>
 <?php $this->load->view('_inc/footer_base'); ?>

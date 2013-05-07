@@ -7,11 +7,13 @@ class Translate extends CI_Controller {
         parent::__construct();
         $this->load->model("tasks_model");
         $this->load->model("projects_model");
+        $this->load->model("youtube_model");
+        $this->load->model("soundcloud_model");
     }
 
     function index()
     {
-        redirect(base_url());
+        redirect();
     }
 
     function task()
@@ -49,5 +51,60 @@ class Translate extends CI_Controller {
             redirect(base_url());
         }
     }
+
+    function audio()
+    {
+        $temp = func_get_args(0);
+        if($temp)
+            $project_id = $temp[0];
+        if(!$project_id)
+            redirect(base_url());
+        if($this->session->userdata("loggedin") && check_permissions(get_session_roleid(), 'admin/translate/audio_audition'))
+        {
+            redirect(base_url('admin/translate/audio_audition/'.$project_id));
+        }
+        $project = $this->projects_model->get_project_by_params($project_id, null, null, null, null, "In Audition")[0];
+        if($project)
+        {
+            $token = $this->soundcloud_model->get_access_token();
+            if($token != null && $token != "" && is_array($token))
+                $data['access_token'] = $token[0];
+            else
+                $data['access_token'] = "error";
+            $data['project_name'] = $project->project_name;
+            $data['project_id'] = $project_id;
+            $data['translate_from'] = $project->translate_from_language;
+            $data['translate_to'] = $project->translate_to_language;
+            $data['project_video_id'] = $project->video_id;
+            $data['video_duration'] = $this->youtube_model->get_video_details($project->video_id)->data->duration;
+            $data['project_description'] = $project->project_description;
+            $data['translated_text'] = $project->translated_text;
+            //$data['access_token'] = $token;
+            $data['client_id'] = $this->config->item("soundcloud_client_id");
+            $data['redirect_url'] = $this->config->item("soundcloud_redirect_url");
+            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $this->load->view("public/public_audio", $data);
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This project does not exists or is not in audition stage.');
+            redirect();
+        }
+    }
+
+    function validate_audio_captcha()
+    {
+        //reCaptcha Validation
+        $this->load->library("recaptcha");
+        $this->recaptcha->recaptcha_check_answer(
+            $_SERVER['REMOTE_ADDR'],
+            $this->input->post('recaptcha_challenge_field'),
+            $this->input->post('recaptcha_response_field')
+        );
+        $data['return_result'] = $this->recaptcha->is_valid;
+        echo json_encode($data);
+    }
+
 }
 ?>

@@ -36,6 +36,13 @@
                             </a>
                         </li>
                     <?php } ?>
+                    <?php if(check_permissions(get_session_roleid(), 'admin/projects/projects_status')) { ?>
+                    <li>
+                        <a tabindex="-1" href="<?php echo base_url('admin/projects/projects_status'); ?>">
+                            Projects statuses
+                        </a>
+                    </li>
+                    <?php } ?>
                 </ul>
             </li>
             <li class="dropdown">
@@ -80,6 +87,36 @@
                     <?php } ?>
                 </ul>
             </li>
+            <?php if(check_permissions(get_session_roleid(), 'admin/translate/audition')) { ?>
+            <li class="dropdown">
+                <a id="audios-drop" data-target="#" role="button" class="dropdown-toggle" data-toggle="dropdown" style="cursor:pointer;">
+                    Auditions <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="translations-drop">
+                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/choose_translations')) { ?>
+                    <li>
+                        <a tabindex="-1" href="<?php echo base_url("admin/translate/choose_translations/1"); ?>">
+                            Choose best audios
+                        </a>
+                    </li>
+                    <?php } ?>
+                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/vote_translations')) { ?>
+                    <li>
+                        <a tabindex="-1" href="<?php echo base_url("admin/translate/vote_translations/1"); ?>">
+                            Vote audios
+                        </a>
+                    </li>
+                    <?php } ?>
+                    <?php if(check_permissions(get_session_roleid(), 'admin/translate/my_audios')) { ?>
+                    <li>
+                        <a tabindex="-1" href="<?php echo base_url("admin/translate/my_audios"); ?>">
+                            My audios
+                        </a>
+                    </li>
+                    <?php } ?>
+                </ul>
+            </li>
+            <?php } ?>
             <?php if(check_permissions(get_session_roleid(), 'admin/users/list_users')) { ?>
                 <li>
                     <a href="<?php echo base_url("admin/users/list_users") ?>">

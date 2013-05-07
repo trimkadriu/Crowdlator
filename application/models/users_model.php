@@ -157,7 +157,7 @@ class Users_model extends CI_Model {
     {
         //Get list of USERS with role name
         //Limit 0 (zero) for all users
-        $sql = 'SELECT DISTINCT u.id, u.fullname, u.country, u.email, if(u.role_id = r.id, r.role, \'no role\') AS `rolename`'.
+        $sql = 'SELECT DISTINCT u.id, u.fullname, u.country, u.email, u.date_created, if(u.role_id = r.id, r.role, \'no role\') AS `rolename`'.
                  'FROM users AS `u`, roles AS `r`'.
                  'HAVING rolename != \'no role\' ';
         if($limit > 0)

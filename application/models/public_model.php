@@ -5,6 +5,7 @@ class Public_model extends CI_Model {
     function __construct()
     {
         $this->load->library("recaptcha");
+        //$this->load->model("audios_model");
     }
 	
     function do_translate()
@@ -56,10 +57,43 @@ class Public_model extends CI_Model {
             {
                 // Translation creation ERROR
                 $this->session->set_flashdata('message_type', 'error');
-                $this->session->set_flashdata('message', 'Error translating task. Error: '.$result);
+                $this->session->set_flashdata('message', 'Error translating task. Please try again later');
                 redirect(base_url());
             }
         }
+    }
+
+    function do_audition()
+    {
+        // POST request
+        $project_id = strip_tags($this->input->post("project_id", TRUE));
+        $audio_id = strip_tags($this->input->post("audio_id", TRUE));
+        $permalink_url = strip_tags($this->input->post("permalink_url", TRUE));
+        $download_url = strip_tags($this->input->post("download_url", TRUE));
+        if(strlen($project_id) == 0)
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This project does not exist.');
+            redirect(base_url());
+        }
+        $user_id = null;
+        $result = $this->audios_model->create_audio($project_id, $user_id, $audio_id, $permalink_url, $download_url);
+        if($result)
+        {
+            // Translation done
+            $this->session->set_flashdata('message_type', 'success');
+            $this->session->set_flashdata('message', 'You have recorded audio successfully.');
+            $data['return_result'] = true;
+        }
+        else
+        {
+            // Translation creation ERROR
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'Error saving audio.');
+            $data['return_result'] = false;
+        }
+        $data['return_url'] = base_url();
+        echo json_encode($data);
     }
 	
 }

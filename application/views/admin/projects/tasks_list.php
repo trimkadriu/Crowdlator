@@ -34,7 +34,7 @@
                         ?>
                     </td>
                     <td style="text-align: center;">
-                        <a href="<?php echo base_url("admin/translate/task_id/".$task->id); ?>"rel="tooltip" data-placement="top" data-original-title="Translate this text">
+                        <a href="<?php echo base_url("admin/translate/task_id/".$task->id); ?>" rel="tooltip" data-placement="top" data-original-title="Translate this text">
                         <i class="icon-text-width"></i></a>
                     </td>
                 </tr>

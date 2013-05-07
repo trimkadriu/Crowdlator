@@ -209,7 +209,6 @@
 </div>
 <script>
 $(document).ready(function() {
-
     $('#second').hide();
     var finish = false;
     var progress_bar = $('#progress_bar');
@@ -305,6 +304,9 @@ $(document).ready(function() {
         dropZone.addClass('youtube_video_div');
         return false;
     };
+
+    $("#parent_texttobetranslated label").find("input[type=radio]").click();//attr('checked', 'checked');
+    //$("#parent_texttobetranslated label").hide();
 });
 
 //AJAX Function for Youtube token

@@ -9,29 +9,25 @@
         <thead>
         <tr>
             <th style="width: 30%;">Project Name</th>
-            <th style="width: 25%;">Date</th>
+            <th style="width: 30%;">Date</th>
             <th style="width: 20%;">From</th>
             <th style="width: 20%;">To</th>
-            <th style="width: 5%;">Type</th>
         </tr>
         </thead>
         <tbody>
-        <?php if($tasks) { for($index = 0; $index < $limit; $index++) { ?>
+        <?php if($tasks) { foreach($tasks as $i=>$task) { ?>
             <tr>
                 <td>
-                    <?php echo $projectname[$index]; ?>
+                    <?php echo $projectname[$i]; ?>
                 </td>
                 <td>
-                    <?php $parse = date_parse($date[$index]); echo $parse['day'].'-'.$parse['month'].'-'.$parse['year'] ;?>
+                    <?php echo $date[$i];//$parse = date_parse($date[$index]); echo $parse['day'].'-'.$parse['month'].'-'.$parse['year'] ;?>
                 </td>
                 <td>
-                    <?php echo $from[$index]; ?>
+                    <?php echo $from[$i]; ?>
                 </td>
                 <td>
-                    <?php echo $to[$index]; ?>
-                </td>
-                <td>
-                    <?php echo $type[$index]; ?>
+                    <?php echo $to[$i]; ?>
                 </td>
             </tr>
                 <?php } } else{ ?>

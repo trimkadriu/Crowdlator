@@ -8,15 +8,15 @@
     <table width="100%" class="table table-hover">
         <thead>
         <tr>
-            <th>Task ID</th>
+            <th style="text-align:center">Task ID</th>
             <th>Date</th>
         </tr>
         </thead>
         <tbody>
-        <?php if($drafts) { for($i = 0; $i < sizeof($drafts); $i++) { ?>
+        <?php if($drafts) { for($i = sizeof($drafts) - 1; $i >= 0; $i--) { ?>
             <tr>
-                <td><?php echo $drafts[$i]->task_id; ?></td>
-                <td style="text-align:center"><?php echo $drafts[$i]->date_created; ?></td>
+                <td style="text-align:center"><?php echo $drafts[$i]->task_id; ?></td>
+                <td><?php echo $drafts[$i]->date_created; ?></td>
             </tr>
                 <?php }} else { ?>
         <tr><td colspan="3">There are no records</td></tr>

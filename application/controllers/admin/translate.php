@@ -10,6 +10,9 @@ class Translate extends CI_Controller {
         $this->load->model('translations_model');
         $this->load->model('drafts_model');
         $this->load->model('votes_model');
+        $this->load->model("audios_model");
+        $this->load->model("soundcloud_model");
+        $this->load->model("youtube_model");
     }
 
     function index()
@@ -387,7 +390,7 @@ class Translate extends CI_Controller {
         }
     }
 
-    public function vote_translations()
+    function vote_translations()
     {
         if(!check_permissions(get_session_roleid(), 'admin/translate/vote_translations'))
             redirect("/pages/permission_exception");
@@ -395,36 +398,66 @@ class Translate extends CI_Controller {
         if($temp)
             $type = $temp[0];
         if(isset($type) && $type == 1)
-            $data['make_active'] = 1;
-        else
-            $data['make_active'] = 0;
-        $translations = $this->translations_model->get_all_translations();
-        $data['translation_nr'] = false;
-        if($translations)
         {
-            $data['translation_nr'] = sizeof($translations);
-            for($i = 0; $i < $data['translation_nr']; $i++)
+            $data['make_active'] = 1;
+            $audios = $this->audios_model->get_audios();
+            $data['audios_nr'] = false;
+            if($audios)
             {
-                $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
-                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
-                $data['translation_id'][$i] = $translations[$i]->id;
-                $data['project_name'][$i] = $project->project_name;
-                $data['date_translated'][$i] = $translations[$i]->date_created;
-                $data['translate_from'][$i] = $project->translate_from_language;
-                $data['translate_to'][$i] = $project->translate_to_language;
-                $data['text'][$i] = $task->text;
-                $data['translated'][$i] = $translations[$i]->translated_text;
-                $data['project_video_id'][$i] = $project->video_id;
-                $data['project_description'][$i] = $project->project_description;
-                $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
-                $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
-                $data['voted'][$i] = $this->votes_model->get_if_user_voted($translations[$i]->id, null, get_session_user_id(), "text");
+                $data['audios_nr'] = sizeof($audios);
+                for($i = 0; $i < $data['audios_nr']; $i++)
+                {
+                    $project = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result()[0];
+                    $data['translation_type'] = "audio";
+                    $data['id'][$i] = $audios[$i]->id;
+                    $data['project_name'][$i] = $project->project_name;
+                    $data['date_created'][$i] = $audios[$i]->date_created;
+                    $data['translate_from'][$i] = $project->translate_from_language;
+                    $data['translate_to'][$i] = $project->translate_to_language;
+                    $data['translated'][$i] = $project->translated_text;
+                    $data['audio_id'][$i] = $audios[$i]->audio_id;
+                    $data['project_video_id'][$i] = $project->video_id;
+                    $data['project_description'][$i] = $project->project_description;
+                    $data['project_id'][$i] = $project->id;
+                    $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", 1, null);
+                    $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", null, 1);
+                    $data['voted'][$i] = $this->votes_model->get_if_user_voted(null, $audios[$i]->id, get_session_user_id(), "audio");
+                }
+                $this->load->view("admin/audios/vote_audios", $data);
             }
         }
-        $this->load->view("admin/translations/vote_translations", $data);
+        else
+        {
+            $data['make_active'] = 0;
+            $translations = $this->translations_model->get_all_translations();
+            $data['translation_nr'] = false;
+            if($translations)
+            {
+                $data['translation_nr'] = sizeof($translations);
+                for($i = 0; $i < $data['translation_nr']; $i++)
+                {
+                    $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                    $data['translation_type'] = "text";
+                    $data['translation_id'][$i] = $translations[$i]->id;
+                    $data['project_name'][$i] = $project->project_name;
+                    $data['date_translated'][$i] = $translations[$i]->date_created;
+                    $data['translate_from'][$i] = $project->translate_from_language;
+                    $data['translate_to'][$i] = $project->translate_to_language;
+                    $data['text'][$i] = $task->text;
+                    $data['translated'][$i] = $translations[$i]->translated_text;
+                    $data['project_video_id'][$i] = $project->video_id;
+                    $data['project_description'][$i] = $project->project_description;
+                    $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
+                    $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
+                    $data['voted'][$i] = $this->votes_model->get_if_user_voted($translations[$i]->id, null, get_session_user_id(), "text");
+                }
+                $this->load->view("admin/translations/vote_translations", $data);
+            }
+        }
     }
 
-    public function vote()
+    function vote()
     {
         if($_POST)
         {
@@ -433,6 +466,10 @@ class Translate extends CI_Controller {
             $vote_type = $this->input->post(strip_tags("vote_type"), true);
             $already_voted = true;
             $result = false;
+            if($translation_type == "text"){
+                $return = 0; $return_url = "translation"; }
+            elseif($translation_type == "audio"){
+                $return = 1; $return_url = "audio"; }
             //Some validations
             if($vote_type == "bad" || $vote_type == "good")
             {
@@ -459,7 +496,9 @@ class Translate extends CI_Controller {
                         {
                             $this->session->set_flashdata('message_type', 'error');
                             $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
-                            redirect("public/vote/translation/".$translation_id);
+                            if($translation_type == "audio")
+                                $translation_id = $this->audios_model->get_audios($translation_id, null, null, null, null)[0]->project_id;
+                            redirect("public/vote/".$return_url."/".$translation_id);
                         }
                         get_if_voted_by_id_type($translation_id, $translation_type);
                         if($translation_type == "text")
@@ -510,21 +549,21 @@ class Translate extends CI_Controller {
                     {
                         $this->session->set_flashdata('message_type', 'error');
                         $this->session->set_flashdata('message', 'You have alredy voted this translation.');
-                        redirect("admin/translate/vote_translations");
+                        redirect("admin/translate/vote_translations/".$return);
                     }
                 }
                 else
                 {
                     $this->session->set_flashdata('message_type', 'error');
                     $this->session->set_flashdata('message', 'Translation type invalid.');
-                    redirect("admin/translate/vote_translations");
+                    redirect("admin/translate/vote_translations/".$return);
                 }
             }
             else
             {
                 $this->session->set_flashdata('message_type', 'error');
                 $this->session->set_flashdata('message', 'Vote type invalid.');
-                redirect("admin/translate/vote_translations");
+                redirect("admin/translate/vote_translations/".$return);
             }
         }
         if($result)
@@ -532,10 +571,10 @@ class Translate extends CI_Controller {
             $this->session->set_flashdata('message_type', 'success');
             $this->session->set_flashdata('message', 'You have successfully voted.');
         }
-        redirect("admin/translate/vote_translations");
+        redirect("admin/translate/vote_translations/".$return);
     }
 
-    public function draft_list()
+    function draft_list()
     {
         if(!check_permissions(get_session_roleid(), 'admin/translate/draft_list'))
             redirect("/pages/permission_exception");
@@ -558,7 +597,7 @@ class Translate extends CI_Controller {
         $this->load->view("admin/translations/draft_list", $data);
     }
 
-    public function drafts()
+    function drafts()
     {
         if(!check_permissions(get_session_roleid(), 'admin/translate/drafts'))
             redirect("/pages/permission_exception");
@@ -661,33 +700,61 @@ class Translate extends CI_Controller {
         if($temp)
             $type = $temp[0];
         if(isset($type) && $type == 1)
-            $data['make_active'] = 1;
-        else
-            $data['make_active'] = 0;
-        $translations = $this->translations_model->get_all_translations_where_choosen_not(1);
-        $data['translation_nr'] = false;
-        if($translations)
         {
-            $data['translation_nr'] = sizeof($translations);
-            for($i = 0; $i < $data['translation_nr']; $i++)
+            $data['make_active'] = 1;
+            $audios = $this->audios_model->get_all_audios_where_choosen_not(1);
+            $data['audios_nr'] = false;
+            if($audios)
             {
-                $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
-                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
-                $data['translation_id'][$i] = $translations[$i]->id;
-                $data['project_name'][$i] = $project->project_name;
-                $data['date_translated'][$i] = $translations[$i]->date_created;
-                $data['translate_from'][$i] = $project->translate_from_language;
-                $data['translate_to'][$i] = $project->translate_to_language;
-                $data['text'][$i] = $task->text;
-                $data['translated'][$i] = $translations[$i]->translated_text;
-                $data['project_video_id'][$i] = $project->video_id;
-                $data['project_description'][$i] = $project->project_description;
-                $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
-                $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
-                $data['choosen'][$i] = $translations[$i]->choosen;
+                $data['audios_nr'] = sizeof($audios);
+                for($i = 0; $i < $data['audios_nr']; $i++)
+                {
+                    //$task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $project = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result()[0];
+                    $data['id'][$i] = $audios[$i]->id;
+                    $data['audio_id'][$i] = $audios[$i]->audio_id;
+                    $data['project_name'][$i] = $project->project_name;
+                    $data['date_recorded'][$i] = $audios[$i]->date_created;
+                    $data['translate_from'][$i] = $project->translate_from_language;
+                    $data['translate_to'][$i] = $project->translate_to_language;
+                    $data['translated'][$i] = $project->translated_text;
+                    $data['project_video_id'][$i] = $project->video_id;
+                    $data['project_description'][$i] = $project->project_description;
+                    $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", 1, null);
+                    $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", null, 1);
+                    $data['choosen'][$i] = $audios[$i]->choosen;
+                }
             }
+            $this->load->view("admin/audios/choose_audios", $data);
         }
-        $this->load->view("admin/translations/choose_translations", $data);
+        else
+        {
+            $data['make_active'] = 0;
+            $translations = $this->translations_model->get_all_translations_where_choosen_not(1);
+            $data['translation_nr'] = false;
+            if($translations)
+            {
+                $data['translation_nr'] = sizeof($translations);
+                for($i = 0; $i < $data['translation_nr']; $i++)
+                {
+                    $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                    $data['translation_id'][$i] = $translations[$i]->id;
+                    $data['project_name'][$i] = $project->project_name;
+                    $data['date_translated'][$i] = $translations[$i]->date_created;
+                    $data['translate_from'][$i] = $project->translate_from_language;
+                    $data['translate_to'][$i] = $project->translate_to_language;
+                    $data['text'][$i] = $task->text;
+                    $data['translated'][$i] = $translations[$i]->translated_text;
+                    $data['project_video_id'][$i] = $project->video_id;
+                    $data['project_description'][$i] = $project->project_description;
+                    $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
+                    $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
+                    $data['choosen'][$i] = $translations[$i]->choosen;
+                }
+            }
+            $this->load->view("admin/translations/choose_translations", $data);
+        }
     }
 
     function chose_translation()
@@ -700,47 +767,196 @@ class Translate extends CI_Controller {
         if(!$translation_id)
             redirect("admin/user/dashboard");
         $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
-        $choosen = $translation->choosen;
         $this->session->set_flashdata('message_type', 'error');
-        $this->session->set_flashdata('message', 'Translation was already choosen.');
-        if($choosen == 0)
+        if($translation->approved == 0)
+        {
+            $this->session->set_flashdata('message', 'Translation is not approved.');
+            redirect("admin/translate/choose_translations/0");
+        }
+        if($translation->choosen == 0)
         {
             if(!$this->translations_model->check_translation_if_choosen($translation->task_id))
             {
                 $result = $this->translations_model->set_choosen($translation_id, 1);
-                $this->session->set_flashdata('message_type', 'success');
-                $this->session->set_flashdata('message', 'That translation was choosen the best.');
+                if($result)
+                {
+                    $this->session->set_flashdata('message_type', 'success');
+                    $this->session->set_flashdata('message', 'That translation was choosen the best.');
+                    //Check project status
+                    $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
+                    $project_id = $task->project_id;
+                    $status = check_project_status($project_id);
+                    if($status)
+                    {
+                        //If all tasks of this project are translated
+                        $text = '';
+                        $pr_tasks = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
+                        foreach($pr_tasks as $pr_task)
+                        {
+                            $this->drafts_model->delete_draft_by_id(null, null, $pr_task->id);
+                            $pr_translations = $this->translations_model->check_translation_by_task_id($pr_task->id);
+                            foreach($pr_translations as $pr_translation)
+                            {
+                                if($pr_translation->id != $translation_id)
+                                {
+                                    $this->votes_model->delete_votes(null, $pr_translation->id, null, null, "text", null, null, null);
+                                    $this->translations_model->delete_translation_by_id($pr_translation->id, null, null, null, null, null, 0);
+                                }
+                            }
+                            //Save final text
+                            $trans = $this->translations_model->get_translation_by_params(null, $pr_task->id, null, null,
+                                null, null, "1")[0];
+                            $text = $text." ".$trans->translated_text;
+                        }
+                        $this->projects_model->update_project_translated_text($project_id, trim($text));
+                        $this->projects_model->update_project_status($project_id, "In Audition");
+                    }
+                }
             }
         }
-        if($result)
-        {
-            //FIXME - Here should add check project status
-        }
-        redirect(base_url("admin/translate/choose_translations/0"));
+        else
+            $this->session->set_flashdata('message', 'Translation was already choosen.');
+        redirect("admin/translate/choose_translations/0");
     }
 
-    private function check_project_status()
+    function choose_audio()
     {
-        $translation = null;
-        $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
-        $tasks = $this->tasks_model->get_tasks_by_project_id($task->project_id)->result();
-        //$ids = array();
-        $finished_status = true;
-        for($i = 0; $i < sizeof($tasks); $i++)
+        if(!check_permissions(get_session_roleid(), 'admin/translate/choose_audio'))
+            redirect("/pages/permission_exception");
+        $audios = func_get_args(0);
+        if($audios)
+            $audio_id = $audios[0];
+        if(!$audio_id)
+            redirect("admin/user/dashboard");
+        $audio = $this->audios_model->get_audios($audio_id, null, null, null, null, 0)[0];
+        $this->session->set_flashdata('message_type', 'error');
+        if($audio)
         {
-            $ids[$i] = $tasks[$i]->id;
-            $translations = $this->translations_model->check_translation_by_task_id($ids[$i]);// print_r($translations);exit;
-            for($j = 0; $j < 3; $j++)
+            //Delete other audios that are recorded for this project from soundcloud and database, also votes
+            $project_id = $audio->project_id;
+            $pr_audios = $this->audios_model->get_audios(null, $project_id, null, null, null, 0);
+            foreach($pr_audios as $pr_audio)
             {
-                if($translations[$i]->choosen == 1)
+                if($pr_audio->audio_id != $audio->audio_id)
                 {
-                    $finished_status = true;
-                    break;
+                    if($this->soundcloud_model->delete_track($pr_audio->audio_id))
+                    {
+                        $this->audios_model->delete_audio(null, null, $pr_audio->audio_id, null, null);
+                        $this->votes_model->delete_votes(null, null, $pr_audio->id, null, "audio", null, null, null);
+                    }
+                    else
+                    {
+                        $this->session->set_flashdata('message_type', 'error');
+                        $this->session->set_flashdata('message', 'That audio was not choosen. Please try again later');
+                        redirect("admin/translate/choose_translations/1");
+                    }
                 }
-                else
-                    $finished_status = false;
+            }
+            //Change project status
+            $this->audios_model->set_choosen($audio_id, 1);
+            $this->projects_model->update_project_status($project_id, "Finished");
+            $this->session->set_flashdata('message_type', 'success');
+            $this->session->set_flashdata('message', 'That audio was choosen the best.');
+        }
+        else
+            $this->session->set_flashdata('message', 'Audio was already choosen.');
+        redirect("admin/translate/choose_translations/1");
+    }
+
+    function audio_audition()
+    {
+        if($this->input->post("public"))
+        {
+            $this->load->model('public_model');
+            $this->public_model->do_audition();
+            exit;
+        }
+        if(!check_permissions(get_session_roleid(), 'admin/translate/audio_audition'))
+            redirect("/pages/permission_exception");
+        if($_POST)
+        {
+            // POST request
+            $project_id = strip_tags($this->input->post("project_id", TRUE));
+            $audio_id = strip_tags($this->input->post("audio_id", TRUE));
+            $permalink_url = strip_tags($this->input->post("permalink_url", TRUE));
+            $download_url = strip_tags($this->input->post("download_url", TRUE));
+            if(strlen($project_id) == 0)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'This project does not exist.');
+                redirect(base_url("admin/projects/list_projects"));
+            }
+            $user_id = get_session_user_id();
+            $result = $this->audios_model->create_audio($project_id, $user_id, $audio_id, $permalink_url, $download_url);
+            if($result)
+            {
+                // Translation done
+                $this->session->set_flashdata('message_type', 'success');
+                $this->session->set_flashdata('message', 'You have recorded audio successfully.');
+                $data['return_result'] = true;
+            }
+            else
+            {
+                // Translation creation ERROR
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Error saving audio.');
+                $data['return_result'] = false;
+            }
+            $data['return_url'] = base_url("admin/projects/list_projects");
+            echo json_encode($data); exit;
+        }
+        $temp = func_get_args(0);
+        if($temp)
+            $project_id = $temp[0];
+        if(!$project_id)
+            redirect("admin/user/dashboard");
+        $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+        $project = $temp1[0];$token = $this->soundcloud_model->get_access_token();
+        $token = $this->soundcloud_model->get_access_token();
+        if($token != null && $token != "" && is_array($token))
+            $data['access_token'] = $token[0];
+        else
+            $data['access_token'] = "error";
+        $data['project_name'] = $project->project_name;
+        $data['project_id'] = $project_id;
+        $data['translate_from'] = $project->translate_from_language;
+        $data['translate_to'] = $project->translate_to_language;
+        $data['project_video_id'] = $project->video_id;
+        $data['video_duration'] = $this->youtube_model->get_video_details($project->video_id)->data->duration;
+        $data['project_description'] = $project->project_description;
+        $data['translated_text'] = $project->translated_text;
+        //$data['access_token'] = $token;
+        $data['client_id'] = $this->config->item("soundcloud_client_id");
+        $data['redirect_url'] = $this->config->item("soundcloud_redirect_url");
+        $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+        $this->load->view("admin/audios/audio_audition", $data);
+    }
+
+    function my_audios()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/translate/my_audios'))
+            redirect("/pages/permission_exception");
+        $audios = $this->audios_model->get_audios(null, null, null, get_session_user_id(), null);
+        $data['audios'] = sizeof($audios);
+        if($audios)
+        {
+            for($i = 0; $i < $data['audios']; $i++)
+            {
+                $temp1 = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result();
+                $project[$i] = $temp1[0];
+                $data['id'][$i] = $audios[$i]->id;
+                $data['project_name'][$i] = $project[$i]->project_name;
+                $data['date_created'][$i] = $audios[$i]->date_created;
+                $data['audio_id'][$i] = $audios[$i]->audio_id;
+                $data['translated_from'][$i] = $project[$i]->translate_from_language;
+                $data['translated_to'][$i] = $project[$i]->translate_to_language;
+                $data['translated_text'][$i] = $project[$i]->translated_text;
             }
         }
+        else
+            $data['audios'] = 0;
+        $this->load->view("admin/audios/my_audios", $data);
     }
+
 }
 ?>
