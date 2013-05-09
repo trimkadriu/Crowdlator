@@ -36,6 +36,7 @@
             </thead>
             <tbody>
             <?php if($translations_nr > 0) { for($i = 0; $i < $translations_nr; $i++) { ?>
+            <?php if($project_status[$i] == "In Translation"){ ?>
             <tr>
                 <!--<td><?php /*echo $task_id[$i]; */?></td>-->
                 <td><?php echo $project_name[$i]; ?></td>
@@ -78,7 +79,7 @@
                     </a>
                 </td>
             </tr>
-                <?php } } else {?>
+            <?php } } } else {?>
             <tr><td colspan="6">No translations found.</td></tr>
                 <?php } ?>
             </tbody>

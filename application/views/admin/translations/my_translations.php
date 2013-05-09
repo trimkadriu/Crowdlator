@@ -9,11 +9,11 @@
             <thead>
             <tr>
                 <th style="width:5%;">ID</th>
-                <th style="width:35%;">Project name</th>
+                <th style="width:25%;">Project name</th>
                 <th id="date" style="width:20%;">Date translated</th>
                 <th style="width:15%;">From</th>
                 <th style="width:15%;">To</th>
-                <th style="width:10%; text-align: center">Actions</th>
+                <th style="width:20%; text-align: center">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -24,11 +24,11 @@
                 <td><?php echo $translations_tasks[$i]->date_created; ?></td>
                 <td><?php echo $translate_from[$i]; ?></td>
                 <td><?php echo $translate_to[$i]; ?></td>
-                <td style="text-align: center">
+                <td style="text-align: left">
                     <a onclick="prepare_modal($(this).next().next().val(), $(this).next().next().next().val());"
                       rel="tooltip" data-placement="top" data-original-title="View translation"
                       href="#translation_detail_modal" data-toggle="modal">
-                        <i class="icon-zoom-in"></i>
+                        <i class="icon-zoom-in"></i> Review translation
                     </a>
                     <textarea style="display: none;"><?php echo $translate_text[$i]; ?></textarea>
                     <textarea style="display: none;"><?php echo $translated_text[$i]; ?></textarea>

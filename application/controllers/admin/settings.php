@@ -1,5 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Settings extends CI_Controller {
 
     function __construct()
@@ -45,6 +49,14 @@ class Settings extends CI_Controller {
                 $password = $this->input->post("password");
                 $email = $this->input->post("email", TRUE);
 
+                //Check user email if already exists
+                $does_email_exists = $this->users_model->check_user_by_email($email);
+                if($does_email_exists)
+                {
+                    $this->session->set_flashdata('message_type', 'error');
+                    $this->session->set_flashdata('message', 'This email is being used by another user');
+                    redirect('admin/settings/account_settings');
+                }
                 //Update users info
                 $results = $this->users_model->update_user_info($user_id, $full_name, $address, $city, $country, $password, $email);
                 if($results)

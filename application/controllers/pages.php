@@ -1,12 +1,25 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Pages extends CI_Controller {
+
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model("projects_model");
+    }
 
 	public function index()
 	{
-		$this->load->view('pages/home');
+        $projects = $this->projects_model->get_random_projects(3, array("In Translation", "In Audition"), null);
+        if($projects)
+            $data['projects'] = $projects;
+		$this->load->view('pages/home', $data);
 	}
-	
+
 	public function admin()
 	{
 		$this->load->view('admin/home');
@@ -14,7 +27,7 @@ class Pages extends CI_Controller {
 	
 	public function home()
 	{
-		$this->load->view('pages/home');
+        $this->index();
 	}
 	
 	public function faq()

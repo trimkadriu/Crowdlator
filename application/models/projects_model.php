@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Projects_model extends CI_Model {
 	
     function __construct()
@@ -23,7 +27,7 @@ class Projects_model extends CI_Model {
 			'break_text' => $break_text,
 			'hash_tags' => $hashtags,
 			'create_date' => date('Y-m-d H:i:s'),
-			'status' => 'In translation'
+			'status' => 'In Translation'
 		);
 		$this->db->insert('projects', $data);
 		$this->db->trans_complete();
@@ -95,6 +99,27 @@ class Projects_model extends CI_Model {
             $this->db->where("create_date", $create_date);
         if($status)
             $this->db->where("status", $status);
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
+
+    function get_random_projects($limit, $status = null, $user_id = null)
+    {
+        $this->db->select("*");
+        $this->db->from("projects");
+        if($status)
+        {
+            foreach($status as &$value)
+                $value = "'".$value."'";
+            $this->db->where("`status` IN (".implode(',', $status).")");
+        }
+        if($user_id)
+            $this->db->where("admin_id", $user_id);
+        $this->db->order_by('id', 'RANDOM');
+        $this->db->limit($limit);
         $query = $this->db->get();
         if($query->num_rows() == 0)
             return false;

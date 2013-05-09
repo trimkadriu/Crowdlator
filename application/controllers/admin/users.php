@@ -1,5 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Users extends CI_Controller {
 
     function __construct()

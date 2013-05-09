@@ -8,11 +8,11 @@
         <table class="table table-hover datatable">
             <thead>
             <tr>
-                <th style="width:35%;">Project name</th>
+                <th style="width:30%;">Project name</th>
                 <th id="date" style="width:20%;">Date saved</th>
                 <th style="width:15%;">From</th>
                 <th style="width:15%;">To</th>
-                <th style="width:10%; text-align: center">Actions</th>
+                <th style="width:20%; text-align: center">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -22,14 +22,14 @@
                 <td><?php echo $date_saved[$i]; ?></td>
                 <td><?php echo $translated_from[$i]; ?></td>
                 <td><?php echo $translated_to[$i]; ?></td>
-                <td style="text-align: center">
-                    <a rel="tooltip" data-placement="top" data-original-title="Continue translating this draft"
+                <td style="text-align: left">
+                    <a rel="tooltip" data-placement="top" data-original-title="Review where you left off this draft."
                         href="<?php echo base_url('admin/translate/drafts/'.$draft_id[$i]); ?>">
-                        <i class="icon-zoom-in"></i>
-                    </a>
+                        <i class="icon-zoom-in"></i> Review draft
+                    </a><br/>
                     <a rel="tooltip" data-placement="top" data-original-title="Remove draft" data-toggle="modal"
                        onclick="prepare_delete_confirm(<?php echo $draft_id[$i]; ?>);" href="#delete_confirm">
-                        <i class="icon-remove"></i>
+                        <i class="icon-remove"></i> Remove draft
                     </a>
                 </td>
             </tr>

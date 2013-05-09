@@ -25,7 +25,7 @@
                     <?php if(check_permissions(get_session_roleid(), 'admin/projects/list_projects')) { ?>
                         <li>
                             <a tabindex="-1" href="<?php echo base_url('admin/projects/list_projects'); ?>">
-                                List
+                                List all projects
                             </a>
                         </li>
                     <?php } ?>
