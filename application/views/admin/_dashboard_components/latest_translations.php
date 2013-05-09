@@ -3,7 +3,7 @@
 <!-- Projects -->
 <div class="span4 round-border" style="margin: 0px;">
     <h4>
-        Translations
+        Latest translations of my tasks
     </h4><hr/>
     <table width="100%" class="table table-hover">
         <thead>
@@ -14,7 +14,8 @@
         </tr>
         </thead>
         <tbody>
-        <?php if($translations) { foreach($translations as $translation) { ?>
+        <?php if($translations) { $counter=0; foreach($translations as $key=>$translation) { ?>
+            <?php if($tr_project_status[$key] == "In Translation") { if($counter == $limit) break; $counter++; ?>
             <tr>
                 <td style="text-align:center"><?php echo $translation->task_id; ?></td>
                 <td><?php echo $translation->date_created; ?></td>
@@ -29,7 +30,7 @@
                     ?>
                 </td>
             </tr>
-                <?php }} else{ ?>
+            <?php } } } else{ ?>
             <tr><td colspan="3">There are no records</td></tr>
             <?php } ?>
         </tbody>

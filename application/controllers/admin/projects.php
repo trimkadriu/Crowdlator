@@ -1,5 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Projects extends CI_Controller {
 
 	function __construct()
@@ -238,10 +242,6 @@ class Projects extends CI_Controller {
         if($user_role == "translator")
         {
             $data['projects'] = $this->projects_model->select_projects();
-            /*foreach($data['projects'] as $key=>$project)
-            {
-                $data['project_status'][$key] = check_project_status($project->id);
-            }*/
         }
         $this->load->view('admin/projects/list_projects', $data);
 	}
@@ -405,6 +405,12 @@ class Projects extends CI_Controller {
             redirect('admin/user/dashboard');
         }
         $temp = $this->projects_model->select_project_by_id($project_id)->result();
+        if($temp[0]->status != "In Translation")
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This project is not in translation stage.');
+            redirect('admin/projects/list_projects');
+        }
         $data['project_name'] = $temp[0]->project_name;
         $data['tasks'] = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
         $this->load->model("translations_model");

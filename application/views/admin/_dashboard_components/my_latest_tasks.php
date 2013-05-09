@@ -15,7 +15,8 @@
         </tr>
         </thead>
         <tbody>
-        <?php if($tasks) { foreach($tasks as $i=>$task) { ?>
+        <?php if(isset($tasks)) { $counter=0; foreach($tasks as $i=>$task) { ?>
+            <?php if($project_status[$i] == "In Translation"){ if($counter == $limit) break; $counter++; ?>
             <tr>
                 <td>
                     <?php echo $projectname[$i]; ?>
@@ -30,9 +31,9 @@
                     <?php echo $to[$i]; ?>
                 </td>
             </tr>
-                <?php } } else{ ?>
+        <?php } } } else{ ?>
             <tr><td colspan="5">There are no records</td></tr>
-            <?php } ?>
+        <?php } ?>
         </tbody>
     </table><hr/>
     <a href="<?php echo base_url('admin/projects/list_tasks'); ?>" class="btn btn-primary btn-small pull-right">View All ></a>

@@ -26,6 +26,7 @@
             </thead>
             <tbody>
             <?php if($audios_nr > 0) { for($i = 0; $i < $audios_nr; $i++) { ?>
+            <?php if($project_status[$i] != "Finished" && $project_status[$i] != "In Translation"){ ?>
             <tr>
                 <td><?php echo $project_name[$i]; ?><br/><?php echo $date_created[$i]; ?></td>
                 <td><?php echo $translate_from[$i]; ?></td>
@@ -74,7 +75,7 @@
                     </span>
                 </td>
             </tr>
-                <?php } } else {?>
+            <?php } } } else {?>
             <tr><td colspan="6">No translations found.</td></tr>
                 <?php } ?>
             </tbody>

@@ -1,5 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Translate extends CI_Controller {
 
     function __construct()
@@ -23,15 +27,21 @@ class Translate extends CI_Controller {
             $task_id = $temp[0];
         if(!$task_id)
             redirect(base_url());
+        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+        $project_id = $task->project_id;
+        $project = $this->projects_model->select_project_by_id($project_id)->result()[0];
+        if($project->status != "In Translation")
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This task belongs to a project which is not in translation stage.');
+            redirect();
+        }
         if($this->session->userdata("loggedin") && check_permissions(get_session_roleid(), 'admin/translate/task_id'))
         {
             redirect(base_url('admin/translate/task_id/'.$task_id));
         }
-        $task = $this->tasks_model->get_task_by_id($task_id)[0];
         if($task)
         {
-            $project_id = $task->project_id;
-            $project = $this->projects_model->select_project_by_id($project_id)->result()[0];
             $data['project_name'] = $project->project_name;
             $data['translate_from'] = $project->translate_from_language;
             $data['translate_to'] = $project->translate_to_language;
@@ -48,7 +58,7 @@ class Translate extends CI_Controller {
         {
             $this->session->set_flashdata('message_type', 'error');
             $this->session->set_flashdata('message', 'This task does not exist.');
-            redirect(base_url());
+            redirect();
         }
     }
 

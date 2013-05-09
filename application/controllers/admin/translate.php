@@ -1,5 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Translate extends CI_Controller {
 
     function __construct()
@@ -39,6 +43,17 @@ class Translate extends CI_Controller {
                 $this->session->set_flashdata('message_type', 'error');
                 $this->session->set_flashdata('message', 'This task does not exist.');
                 redirect("admin/user/dashboard");
+            }
+            $temp = $this->tasks_model->get_task_by_id($task_id);
+            $task = $temp[0];
+            $project_id = $task->project_id;
+            $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+            $project = $temp1[0];
+            if($project->status != "In Translation")
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'This task belongs to a project which is not in translation stage.');
+                redirect("admin/projects/list_projects");
             }
             //reCaptcha Validation
             $this->load->library("recaptcha");
@@ -91,11 +106,17 @@ class Translate extends CI_Controller {
             redirect("admin/user/dashboard");
         $temp = $this->tasks_model->get_task_by_id($task_id);
         $task = $temp[0];
+        $project_id = $task->project_id;
+        $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+        $project = $temp1[0];
+        if($project->status != "In Translation")
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This task belongs to a project which is not in translation stage.');
+            redirect("admin/projects/list_projects");
+        }
         if($task)
         {
-            $project_id = $task->project_id;
-            $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
-            $project = $temp1[0];
             $data['project_name'] = $project->project_name;
             $data['translate_from'] = $project->translate_from_language;
             $data['translate_to'] = $project->translate_to_language;
@@ -171,6 +192,7 @@ class Translate extends CI_Controller {
                         $projects[$i] = $temp[0];
                         //$data['task_id'][$i] = $data['tasks'][$i]->id;
                         $data['project_name'][$i] = $projects[$i]->project_name;
+                        $data['project_status'][$i] = $projects[$i]->status;
                         $data['translate_from'][$i] = $projects[$i]->translate_from_language;
                         $data['translate_to'][$i] = $projects[$i]->translate_to_language;
                         $data['translate_text'][$i] = $task->text; //$data['tasks'][$i]->text;
@@ -230,6 +252,7 @@ class Translate extends CI_Controller {
                         $projects[$i] = $temp[0];
                         //$data['task_id'][$i] = $data['tasks'][$i]->id;
                         $data['project_name'][$i] = $projects[$i]->project_name;
+                        $data['project_status'][$i] = $projects[$i]->status;
                         $data['translate_from'][$i] = $projects[$i]->translate_from_language;
                         $data['translate_to'][$i] = $projects[$i]->translate_to_language;
                         $data['translate_text'][$i] = $task->text;
@@ -289,6 +312,7 @@ class Translate extends CI_Controller {
                         $projects[$i] = $temp[0];
                         //$data['task_id'][$i] = $data['tasks'][$i]->id;
                         $data['project_name'][$i] = $projects[$i]->project_name;
+                        $data['project_status'][$i] = $projects[$i]->status;
                         $data['translate_from'][$i] = $projects[$i]->translate_from_language;
                         $data['translate_to'][$i] = $projects[$i]->translate_to_language;
                         $data['translate_text'][$i] = $task->text;
@@ -408,6 +432,7 @@ class Translate extends CI_Controller {
                 for($i = 0; $i < $data['audios_nr']; $i++)
                 {
                     $project = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result()[0];
+                    $data['project_status'][$i] = $project->status;
                     $data['translation_type'] = "audio";
                     $data['id'][$i] = $audios[$i]->id;
                     $data['project_name'][$i] = $project->project_name;
@@ -438,6 +463,7 @@ class Translate extends CI_Controller {
                 {
                     $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
                     $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                    $data['project_status'][$i] = $project->status;
                     $data['translation_type'] = "text";
                     $data['translation_id'][$i] = $translations[$i]->id;
                     $data['project_name'][$i] = $project->project_name;
@@ -466,11 +492,30 @@ class Translate extends CI_Controller {
             $vote_type = $this->input->post(strip_tags("vote_type"), true);
             $already_voted = true;
             $result = false;
-            if($translation_type == "text"){
-                $return = 0; $return_url = "translation"; }
-            elseif($translation_type == "audio"){
-                $return = 1; $return_url = "audio"; }
-            //Some validations
+            if($translation_type == "text")
+            {
+                $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
+                $temp = $this->tasks_model->get_task_by_id($translation->task_id);
+                $task = $temp[0];
+                $project_id = $task->project_id;
+                $return = 0; $return_url = "translation";
+            }
+            elseif($translation_type == "audio")
+            {
+                $audio = $this->audios_model->get_audios(null, null, $translation_id, null, null, null)[0];
+                $project_id = $audio->task_id;
+                $return = 1; $return_url = "audio";
+            }
+            //Validate if project is in translation stage
+            $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+            $project = $temp1[0];
+            if($translation_type == "text")
+                if($project->status != "In Translation")
+                    redirect();
+            if($translation_type == "text")
+                if($project->status != "In Audition")
+                    redirect();
+                //Some validations
             if($vote_type == "bad" || $vote_type == "good")
             {
                 if($translation_type == "text" || $translation_type == "audio")
@@ -606,6 +651,17 @@ class Translate extends CI_Controller {
         {
             $draft_id = strip_tags($this->input->post("draft_id", true));
             $task_id = strip_tags($this->input->post("task_id", true));
+            $temp = $this->tasks_model->get_task_by_id($task_id);
+            $task = $temp[0];
+            $project_id = $task->project_id;
+            $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+            $project = $temp1[0];
+            if($project->status != "In Translation")
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'This task belongs to a project which is not in translation stage.');
+                redirect("admin/translate/draft_list");
+            }
             //reCaptcha Validation
             $this->load->library("recaptcha");
             $this->recaptcha->recaptcha_check_answer(
@@ -647,11 +703,17 @@ class Translate extends CI_Controller {
         $task_id = $draft->task_id;
         $temp = $this->tasks_model->get_task_by_id($task_id);
         $task = $temp[0];
+        $project_id = $task->project_id;
+        $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
+        $project = $temp1[0];
+        if($project->status != "In Translation")
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This task belongs to a project which is not in translation stage.');
+            redirect("admin/translate/draft_list");
+        }
         if($task)
         {
-            $project_id = $task->project_id;
-            $temp1 = $this->projects_model->select_project_by_id($project_id)->result();
-            $project = $temp1[0];
             $data['project_name'] = $project->project_name;
             $data['translate_from'] = $project->translate_from_language;
             $data['translate_to'] = $project->translate_to_language;
@@ -777,40 +839,34 @@ class Translate extends CI_Controller {
         {
             if(!$this->translations_model->check_translation_if_choosen($translation->task_id))
             {
-                $result = $this->translations_model->set_choosen($translation_id, 1);
-                if($result)
+                $this->translations_model->set_choosen($translation_id, 1);
+                $this->session->set_flashdata('message_type', 'success');
+                $this->session->set_flashdata('message', 'That translation was choosen the best.');
+                //Check project status
+                $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
+                $project_id = $task->project_id;
+                $status = check_project_status($project_id);
+                if($status)
                 {
-                    $this->session->set_flashdata('message_type', 'success');
-                    $this->session->set_flashdata('message', 'That translation was choosen the best.');
-                    //Check project status
-                    $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
-                    $project_id = $task->project_id;
-                    $status = check_project_status($project_id);
-                    if($status)
+                    //If all tasks of this project are translated
+                    $text = '';
+                    $pr_tasks = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
+                    foreach($pr_tasks as $pr_task)
                     {
-                        //If all tasks of this project are translated
-                        $text = '';
-                        $pr_tasks = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
-                        foreach($pr_tasks as $pr_task)
+                        $this->drafts_model->delete_draft_by_id(null, null, $pr_task->id);
+                        $pr_translations = $this->translations_model->get_translation_by_params(null, $pr_task->id, null, null, null, null, 0);
+                        $this->translations_model->delete_not_choosen_translations_by_task_id($pr_task->id);
+                        foreach($pr_translations as $pr_translation)
                         {
-                            $this->drafts_model->delete_draft_by_id(null, null, $pr_task->id);
-                            $pr_translations = $this->translations_model->check_translation_by_task_id($pr_task->id);
-                            foreach($pr_translations as $pr_translation)
-                            {
-                                if($pr_translation->id != $translation_id)
-                                {
-                                    $this->votes_model->delete_votes(null, $pr_translation->id, null, null, "text", null, null, null);
-                                    $this->translations_model->delete_translation_by_id($pr_translation->id, null, null, null, null, null, 0);
-                                }
-                            }
-                            //Save final text
-                            $trans = $this->translations_model->get_translation_by_params(null, $pr_task->id, null, null,
-                                null, null, "1")[0];
-                            $text = $text." ".$trans->translated_text;
+                            $this->votes_model->delete_votes(null, $pr_translation->id, null, null, "text", null, null, null);
                         }
-                        $this->projects_model->update_project_translated_text($project_id, trim($text));
-                        $this->projects_model->update_project_status($project_id, "In Audition");
+                        //Save final text
+                        $trans = $this->translations_model->get_translation_by_params(null, $pr_task->id, null, null, null, null, "1")[0];
+                        if($trans)
+                            $text = $text." ".$trans->translated_text;
                     }
+                    $this->projects_model->update_project_translated_text($project_id, trim($text));
+                    $this->projects_model->update_project_status($project_id, "In Audition");
                 }
             }
         }

@@ -2,7 +2,7 @@
 
 <!-- Carousel
     ================================================== -->
-    <div id="myCarousel" class="carousel slide">
+    <div id="myCarousel" class="carousel slide" style="margin-bottom: 40px">
       <div class="carousel-inner">
         <div class="item active">
           <img src="<?php echo base_url().'template/images/slide-01.jpg'; ?>" alt="">
@@ -43,33 +43,47 @@
     ================================================== -->
     <!-- Wrap the rest of the page in another container to center all the content. -->
 
-    <div class="container marketing">
+    <div class="container marketing" style="padding-left: 20px;">
         <div class="row">
-            <div class="span12"><h4>This section will be populated soon.</h4></div>
-            <!--<div class="span4">
-                <img class="img-circle" data-src="holder.js/140x140">
-                <h2>First project</h2>
-                <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies
-                    vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo
-                    cursus magna, vel scelerisque nisl consectetur et.</p>
-                <p><a class="btn" href="./index_files/index.htm">View details »</a></p>
+            <?php if(isset($projects)) { ?>
+            <h2 style="padding-left: 20px; margin-bottom: 30px">Some of the projects that are being translated.</h2>
+            <?php foreach($projects as $project) {?>
+                <div class="span4">
+                    <div style="position: relative">
+                        <a onclick="prepare_video_modal('<?php echo $project->video_id; ?>')" data-toggle="modal" href="#video_modal">
+                            <img class="img-polaroid" src="http://img.youtube.com/vi/<?php echo $project->video_id; ?>/0.jpg" />
+                            <img src="<?php echo base_url("template/img/play_button.png"); ?>"
+                                style="position: absolute; top: 85px; left: 123px; height: 64px; width: 64px;"/>
+                        </a>
+                    </div>
+                    <h3><?php echo $project->project_name; ?></h3>
+                    <p><?php echo $project->project_description; ?></p>
+                </div>
+            <?php } ?>
+            <div class="span12">
+                <a class="btn btn-primary pull-right" href="<?php echo base_url('pages/translations')?>">See more projects »</a>
             </div>
-            <div class="span4">
-                <img class="img-circle" data-src="holder.js/140x140">
-                <h2>Second project</h2>
-                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras
-                    mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                    condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                <p><a class="btn" href="./index_files/index.htm">View details »</a></p>
-            </div>
-            <div class="span4">
-                <img class="img-circle" data-src="holder.js/140x140">
-                <h2>Third project</h2>
-                <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula
-                    porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
-                    ut fermentum massa justo sit amet risus.</p>
-                <p><a class="btn" href="./index_files/index.htm">View details »</a></p>
-            </div>-->
+            <?php } else { ?>
+                <div class="span12"><h4>This section will be populated soon.</h4></div>
+            <?php } ?>
         </div>
- 
+        <div class="modal hide fade" id="video_modal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                Video
+            </div>
+            <div class="modal-body">
+                <!-- Youtube Video Here -->
+                <iframe id="video" width="500" height="280" frameborder="0" allowfullscreen></iframe>
+                <!-- End of Video Here -->
+            </div>
+            <div class="modal-footer">
+                <a class="btn" data-dismiss="modal">Close</a>
+            </div>
+        </div>
 <?php $this->load->view('_inc/footer'); ?>
+<script>
+    function prepare_video_modal(video_id) {
+        $("#video").attr("src", "http://www.youtube.com/embed/" + video_id);
+    }
+</script>

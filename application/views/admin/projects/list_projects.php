@@ -18,9 +18,8 @@
             </thead>
             <tbody>
             <?php if($projects != null) { $index = 0; foreach($projects as $project) { ?>
-                <?php if(get_user_role() == "translator" && $project->status != "In Translation"); else{ ?>
+                <?php if(get_user_role() == "translator" && $project->status == "Finished"); else{ ?>
                 <tr id="<?php echo $project->id; ?>">
-                    <!--<td><?php /*echo $project->id; */?></td>-->
                     <td>
                         <span style="display: none"><?php echo $project->create_date; ?></span>
                         <?php echo $project->project_name; ?><br/><?php echo $project->create_date; ?>
@@ -48,11 +47,36 @@
                             <a href="<?php echo base_url('admin/translate/audio_audition/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="Record audio">
                                 <img src="<?php echo base_url("template/img/extra_icons/glyphicons_300_microphone.png"); ?>"
                                         style="height: 13px; width: 8px;"/> Record audio</a><br/>
-                        <?php } } elseif($project->status == "In Translation") { ?>
+                        <?php } ?>
+                            <span rel="tooltip" data-placement="top" data-original-title="Ask people to record audio for this project by sharing it on Facebook.">
+                                <a href="#" onclick="facebook_share('<?php echo urlencode(base_url("public/translate/audio")."/".$project->id); ?>', $(this).parent().attr('data-original-title'))">
+                                    <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
+                                         style="width: 13px; height: 13px"/> Facebook
+                                </a>
+                            </span><br/>
+                            <span rel="tooltip" data-placement="top" data-original-title="Ask people to record audio for this project by sharing it on Twitter.">
+                                <a href="#" onclick="twitter_share('<?php echo urlencode(base_url("public/translate/audio")."/".$project->id) ?>', $(this).parent().attr('data-original-title')) ">
+                                    <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
+                                         style="width: 13px; height: 13px"/> Twitter
+                                </a>
+                            </span><br/>
+                        <?php } elseif($project->status == "In Translation") { ?>
                             <?php if(check_permissions(get_session_roleid(), 'admin/projects/tasks_list')) { ?>
                                 <a href="<?php echo base_url('admin/projects/tasks_list/'.$project->id); ?>" rel="tooltip" data-placement="top" data-original-title="List project tasks">
                                 <i class="icon-th-list"></i> View tasks</a><br/>
                             <?php } ?>
+                            <span rel="tooltip" data-placement="top" data-original-title="Ask people to translate text for this project by sharing it on Facebook.">
+                                <a href="#" onclick="facebook_share('<?php echo urlencode(base_url("public/translate/project")."/".$project->id); ?>', $(this).parent().attr('data-original-title'))">
+                                    <img src="<?php echo base_url("template/img/extra_icons/glyphicons_410_facebook.png"); ?>"
+                                         style="width: 13px; height: 13px"/> Facebook
+                                </a>
+                            </span><br/>
+                            <span rel="tooltip" data-placement="top" data-original-title="Ask people to translate text for this project by sharing it on Twitter.">
+                                <a href="#" onclick="twitter_share('<?php echo urlencode(base_url("public/translate/project")."/".$project->id) ?>', $(this).parent().attr('data-original-title')) ">
+                                    <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
+                                         style="width: 13px; height: 13px"/> Twitter
+                                </a>
+                            </span><br/>
                         <?php } ?>
                         <a onclick="prepare_video_modal('<?php echo $project->video_id; ?>', '<?php echo $project->project_name; ?>');"
                            href="#video_modal" rel="tooltip" data-placement="top" data-original-title="Open video of this project."
@@ -117,6 +141,14 @@
     function prepare_video_modal(video_id, project_name) {
         $("#video").attr("src", "http://www.youtube.com/embed/" + video_id);
         $("#video_modal_title").text("Video of '" + project_name + "'");
+    }
+
+    function facebook_share(url, text) {
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '', 'width=600,height=300');
+    }
+
+    function twitter_share(url, text) {
+        window.open('https://twitter.com/intent/tweet?text=' + text + ' ' + url, '', 'width=600,height=300');
     }
 </script>
 <?php $this->load->view('_inc/footer_base'); ?>

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Soundcloud_model extends CI_Model {
 
     private $sc_client_id;

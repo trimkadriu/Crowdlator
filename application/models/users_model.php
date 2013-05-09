@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Users_model extends CI_Model {
 	
     function __construct()

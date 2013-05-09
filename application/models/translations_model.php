@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class Translations_model extends CI_Model {
 	
     function __construct()
@@ -51,6 +55,20 @@ class Translations_model extends CI_Model {
     {
         $this->db->trans_start();
         $this->db->where('task_id', $task_id);
+        $this->db->delete('translations');
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
+    function delete_not_choosen_translations_by_task_id($task_id)
+    {
+        $this->db->trans_start();
+        $this->db->where('task_id', $task_id);
+        $this->db->where('choosen', 0);
         $this->db->delete('translations');
         $this->db->trans_complete();
         $log = $this->db->last_query();

@@ -1,5 +1,10 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
+
 //
 // Check user permission by role
 //
@@ -148,14 +153,14 @@ function check_project_status($project_id)
     $tasks = $CI->tasks_model->get_tasks_by_project_id($project_id)->result();
     $success = 0;
     $status = false;
-    for($i = 0; $i < sizeof($tasks); $i++)
+    foreach($tasks as $task)
     {
-        $translations = $CI->translations_model->check_translation_by_task_id($tasks[$i]->id);
+        $translations = $CI->translations_model->check_translation_by_task_id($task->id);
         if($translations)
         {
-            for($j = 0; $j < sizeof($translations); $j++)
+            foreach($translations as $translation)
             {
-                if($translations[$j]->choosen == 1)
+                if($translation->choosen == 1)
                 {
                     $success++;
                     break;

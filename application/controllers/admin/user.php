@@ -1,5 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * @Author: Trim Kadriu <trim.kadriu@hotmail.com>
+ *
+ */
 class User extends CI_Controller {
 	
 	function __construct()
@@ -107,8 +111,9 @@ class User extends CI_Controller {
 
     private function get_editor_data()
     {
-        $tasks = $this->tasks_model->get_tasks_by_editor(get_session_user_id(), 5);
+        $tasks = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
         $data['translations'] = false;
+        $data['limit'] = 5;
         if($tasks){
             // Latest tasks
             $ids = array();
@@ -116,20 +121,26 @@ class User extends CI_Controller {
             {
                 $temp_proj = $this->projects_model->select_project_by_id($tasks[$i]->project_id)->result();
                 $project = $temp_proj[0];
-                if($project->status == "In Translation")
-                {
-                    $ids[$i] = $tasks[$i]->id;
-                    $data['tasks'][$i] = $tasks[$i];
-                    $data['projectname'][$i] = $project->project_name;
-                    $data['date'][$i] = $project->create_date;
-                    $data['from'][$i] = $project->translate_from_language;
-                    $data['to'][$i] = $project->translate_to_language;
-                }
+                $ids[$i] = $tasks[$i]->id;
+                $data['tasks'][$i] = $tasks[$i];
+                $data['projectname'][$i] = $project->project_name;
+                $data['project_status'][$i] = $project->status;
+                $data['date'][$i] = $project->create_date;
+                $data['from'][$i] = $project->translate_from_language;
+                $data['to'][$i] = $project->translate_to_language;
             }
             // Latest translations
             if(sizeof($ids) > 0)
             {
-                $data['translations'] = $this->translations_model->get_translations_by_task_ids($ids, 5);
+                $translations = $this->translations_model->get_translations_by_task_ids($ids, false);//print_r($translations);exit;
+                for($i = 0; $i < sizeof($translations); $i++)
+                {
+                    $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $temp_proj = $this->projects_model->select_project_by_id($task->project_id)->result();
+                    $project = $temp_proj[0];
+                    $data['translations'][$i] = $translations[$i];
+                    $data['tr_project_status'][$i] = $project->status;
+                }//print_r($data['translations']);exit;
             }
         }
         // START data for Forehead Message
