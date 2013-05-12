@@ -190,7 +190,8 @@ class User extends CI_Controller {
             for($i = 0; $i < $data['translation_nr']; $i++)
             {
                 $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
-                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
+                $project = $temp[0];
                 $data['translation_id'][$i] = $translations[$i]->id;
                 $data['project_name'][$i] = $project->project_name;
                 $data['translated_date'][$i] = $translations[$i]->date_created;
