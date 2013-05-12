@@ -428,7 +428,6 @@ $config['terms_conditions'] = 'To be provided soon...';
 | Some other settings
 |
 */
-//$config['application_domain'] = 'localhost'; // Very important for public voting
 $config['application_title'] = 'Crowdlator';
 $config['application_name'] = 'Crowdlator';
 $config['application_issuer'] = 'Al Jazeera'; // Also you can add link "<a href="URL">LINK</a>"

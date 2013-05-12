@@ -8,7 +8,7 @@
             <div class="control-group"><?php
                 echo form_label('Project name:', 'projectname', array('class', 'control-label')); ?>
                 <div class="controls"><?php
-                    $input_projectname = array('type' => 'text', 'name' => 'project_name',
+                    $input_projectname = array('type' => 'text', 'name' => 'project_name', 'maxlength' => '50',
                                         'placeholder' => 'Your project name', 'required' => 'required',
                                         'class' => 'input-block-level');
                     echo form_input($input_projectname); ?>
@@ -18,7 +18,7 @@
                 echo form_label('Project description:', 'projectdescription', array('class', 'control-label')); ?>
                 <div class="controls"><?php
                     $input_projectname = array('type' => 'text', 'name' => 'project_description',
-                                        'required' => 'required', 'rows' => '6',
+                                        'required' => 'required', 'rows' => '6', 'maxlength' => '250',
                                         'class' => 'input-block-level');
                     echo form_textarea($input_projectname); ?>
                 </div>
@@ -354,6 +354,9 @@ function create_project(){
                 finish = true;
                 progress_bar_text.text('Preparing video upload...');
                 get_youtube_token();
+            }
+            else{
+                window.location.href = "<?php echo base_url('admin/projects/create_project')?>";
             }
         }
     });

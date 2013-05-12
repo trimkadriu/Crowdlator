@@ -52,7 +52,7 @@
                 <button class="btn btn-danger" id="reset_audio">New Record</button>
                 <button class="btn btn-success" disabled="disabled" id="upload_button">Upload Audio</button>
             </div>
-            <strong>Note: </strong>This video duration is <?php echo $video_duration; ?>s.
+            <strong>Note: </strong>This video duration is <?php echo $video_duration; ?>s. Please note that every second more than the video duration will be truncated.
         </span>
     </div>
     <div class="span5">

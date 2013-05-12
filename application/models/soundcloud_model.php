@@ -13,6 +13,7 @@ class Soundcloud_model extends CI_Model {
 
     private $ds;
     private $script_location;
+    private $application_location;
 
     function __construct()
     {
@@ -25,6 +26,7 @@ class Soundcloud_model extends CI_Model {
         $this->sc_pass = $this->config->item("soundcloud_password");
         $this->ds = DIRECTORY_SEPARATOR;
         $this->script_location = dirname(__FILE__).$this->ds.'..'.$this->ds.'libraries'.$this->ds;
+        $this->application_location = dirname(__FILE__).$this->ds.'..'.$this->ds;
     }
 
     function get_access_token()
@@ -45,6 +47,18 @@ class Soundcloud_model extends CI_Model {
         //Execute python script and save results
         exec("python \"".$script_location."\" ".$params, $result);
         if($result[0] == "ok")
+            return true;
+        return false;
+    }
+
+    function download_track($project_id, $audio_id, $permalink)
+    {
+        $youtubedl_location = $this->application_location.'third_party'.$this->ds.'youtube-dl';
+        $audios_location = $this->application_location.'..'.$this->ds.'audios'.$this->ds;
+        $filename = $project_id."_".$audio_id.".mp3";
+        $params = "-o \"".$audios_location.$filename."\" ".$permalink;
+        exec("python \"".$youtubedl_location."\" ".$params, $result);
+        if(file_exists($audios_location.$filename))
             return true;
         return false;
     }
