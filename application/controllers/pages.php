@@ -65,9 +65,12 @@ class Pages extends CI_Controller {
 		$this->load->view('pages/register');
 	}
 	
-	public function translations()
+	public function projects()
 	{
-		$this->load->view('pages/translations');
+        $projects = $this->projects_model->get_random_projects(9, array("In Translation", "In Audition"), null);
+        if($projects)
+            $data['projects'] = $projects;
+		$this->load->view('pages/projects', $data);
 	}
 
     public function permission_exception()

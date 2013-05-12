@@ -61,7 +61,7 @@
                 </div>
             <?php } ?>
             <div class="span12">
-                <a class="btn btn-primary pull-right" href="<?php echo base_url('pages/translations')?>">See more projects »</a>
+                <a class="btn btn-primary pull-right" href="<?php echo base_url('pages/projects')?>">See more projects »</a>
             </div>
             <?php } else { ?>
                 <div class="span12"><h4>This section will be populated soon.</h4></div>

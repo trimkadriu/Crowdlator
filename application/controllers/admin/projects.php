@@ -16,13 +16,13 @@ class Projects extends CI_Controller {
         $this->load->model("youtube_model");
         $this->load->model("soundcloud_model");
         $this->load->model("audios_model");
+        $this->load->model("votes_model");
+        $this->load->model("drafts_model");
     }
 
 	private function break_text($text, $type, $break_number)
 	{
-		//Break text function needed by CREATE PROJECT
-		//page to create micro tasks for editors
-        $index = 0; $tmp = array(); $result = array(); $results = array();
+	    $result = array();
 		if($type == 'sentences')
         {
 			$tmp = explode(".", $text);
@@ -30,8 +30,7 @@ class Projects extends CI_Controller {
 				$result[] = implode('.', array_splice($tmp, 0, $break_number));
 			}
         }
-		//For PARAGRAPHS text break
-		if($type == 'paragraphs')
+		elseif($type == 'paragraphs')
         {
             $text = preg_replace("\n(\s*\n)", "\n", $text);
 			$tmp = explode("\n", $text);
@@ -39,17 +38,6 @@ class Projects extends CI_Controller {
 				$result[] = implode('\n', array_splice($tmp, 0, $break_number));
 			}
         }
-		//Check if results contain empty/null rows
-		/*foreach($result as $row)
-		{
-            if($row == " " || $row == "" || $row == null || strpos($row, "\n") || strpos($row, "\r"))
-            {
-                $results[] $row.'------------------';
-                //unset($result[$index]);
-                //$result[$index] = trim($row);
-            }
-            $index++;
-		}*/
 		return $result;
 	}
 
@@ -273,38 +261,51 @@ class Projects extends CI_Controller {
         }
         else
         {
-            $project = $this->projects_model->select_project_by_id($project_id)->result();
-            $temp = $project[0];
-            if($temp->video_id != null)
-            {
-                $this->youtube_model->delete_youtube_video($temp->video_id);
-            }
-            $this->load->model("translations_model");
-            $tasks = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
+            $temp = $this->projects_model->select_project_by_id($project_id)->result();
+            $project = $temp[0];
+
+            //Delete youtube video
+            $this->youtube_model->delete_youtube_video($project->video_id);
+
+            //Delete all audios
+            $audios = $this->audios_model->get_audios(null, $project->id, null, null, null, null);
+            if($audios)
+                foreach($audios as $audio)
+                {
+                    $this->soundcloud_model->delete_track($audio->audio_id);
+                    $this->votes_model->delete_votes(null, null, $audio->id, null, "audio", null, null, null);
+                }
+            $this->audios_model->delete_audio(null, $project->id, null, null, null);
+
             //Delete all translations
+            $task_ids = array();
+            $tasks = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
             for($i = 0; $i <= sizeof($tasks) - 1; $i++)
             {
-                $this->translations_model->delete_translations_by_task_id($tasks[$i]->id);
+                $task_ids[$i] = $tasks[$i]->id;
+                //Delete drafts
+                $this->drafts_model->delete_draft_by_id(null, null, $tasks[$i]->id);
             }
+            $translations = $this->translations_model->get_translations_by_task_ids($task_ids, null, null, null);
+            if($translations)
+                foreach($translations as $translation)
+                {
+                    $this->votes_model->delete_votes(null, $translation->id, null, null, "text", null, null, null);
+                    $this->translations_model->delete_translation_by_id($translation->id, null, null, null, null, null, null);
+                }
+
             //Delete all project tasks
-            if(!$this->tasks_model->delete_tasks_by_project_id($project_id))
+            $this->tasks_model->delete_tasks_by_project_id($project_id);
+            //Delete project itself
+            if($this->projects_model->delete_project_by_id($project_id))
             {
-                $type = 'error';
-                $message_text = $this->tasks_model->delete_tasks_by_project_id($project_id);
+                $type = 'success';
+                $message_text = 'You have deleted the project successfully.';
             }
             else
             {
-                //Delete project itself
-                if($this->projects_model->delete_project_by_id($project_id))
-                {
-                    $type = 'success';
-                    $message_text = 'You have deleted the project successfully.';
-                }
-                else
-                {
-                    $type = 'error';
-                    $message_text = $this->projects_model->delete_project_by_id($project_id);
-                }
+                $type = 'error';
+                $message_text = $this->projects_model->delete_project_by_id($project_id);
             }
             $this->session->set_flashdata('message_type', $type);
             $this->session->set_flashdata('message', $message_text);
@@ -557,7 +558,7 @@ class Projects extends CI_Controller {
         }
     }
 
-    function generate_download_video_link()
+    public function generate_download_video_link()
     {
         if(!check_permissions(get_session_roleid(), 'admin/projects/generate_download_video_link'))
             redirect("pages/permission_exception");
@@ -570,6 +571,35 @@ class Projects extends CI_Controller {
         $data = file_get_contents($final_location.$video_filename);
         $name = 'final_video_'.generateRandomString(5).'.mp4';
         force_download($name, $data);
+    }
+
+    public function delete_task()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/projects/generate_video'))
+            redirect("pages/permission_exception");
+        $temp = func_get_args(0);
+        if($temp)
+            $task_id = $temp[0];
+        else
+            redirect("admin/projects/list_projects");
+        $translations = $this->translations_model->get_translations_by_task_ids(array($task_id), null, null, null);
+        if($translations)
+            foreach($translations as $translation)
+                $this->votes_model->delete_votes(null, $translation->id, null, null, "text", null, null, null);
+        $this->drafts_model->delete_draft_by_id(null, null, $task_id);
+        $this->translations_model->delete_translations_by_task_id($task_id);
+
+        if($this->tasks_model->delete_tasks($task_id, null, null))
+        {
+            $this->session->set_flashdata('message_type', 'success');
+            $this->session->set_flashdata('message', 'Task is deleted successfully.');
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'The task could not be deleted.');
+        }
+        redirect("admin/projects/list_projects");
     }
 
 }

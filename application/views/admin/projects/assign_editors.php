@@ -25,6 +25,10 @@
                         <?php echo $task->text; ?>
                     </td>
                     <td>
+                        <a rel="tooltip" data-placement="top" data-original-title="Delete this task." data-toggle="modal"
+                            onclick="prepare_delete_confirm('<?php echo $task->id; ?>');" href="#delete_task_modal">
+                            <i class="icon-remove"></i> Delete task
+                        </a><br/><br/>
                         <div id="div_input_tag" style="position: relative;">
                             <div class="input_tag_overlay" style="display: none;" id="overlay_<?php echo $task->id; ?>">
                                 <span class="pull-right">Editor is set</span>
@@ -67,8 +71,34 @@
         </table>
     </div>
 </div>
+<div class="modal hide fade" id="delete_task_modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Delete confirm</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to delete this task ?
+        </p>
+        <input type="hidden" id="task_id">
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-danger" data-dismiss="modal">No</a>
+        <a class="btn btn-success" id="delete_task">Yes</a>
+    </div>
+</div>
 <?php $this->load->view('_inc/datatables'); ?>
 <script>
+    $(document).ready(function () {
+        $("#delete_task").click(function() {
+            task_id = $("#task_id").val();
+            window.location.href = "<?php echo base_url('admin/projects/delete_task'); ?>/" + task_id;
+        });
+    });
+    function prepare_delete_confirm(task_id) {
+        $("#task_id").val(task_id);
+    }
+
     function edit_input_tag(id) {
         $('#overlay_' + id).hide();
         $('#tag_input' + id).tokenInput("clear");

@@ -88,6 +88,23 @@ class Tasks_model extends CI_Model {
             return false;
     }
 
+    function delete_tasks($id = null, $project_id = null, $editor_id = null)
+    {
+        $this->db->trans_start();
+        if($id)
+            $this->db->where('id', $id);
+        if($project_id)
+            $this->db->where('project_id', $project_id);
+        if($editor_id)
+            $this->db->where('editor_id', $editor_id);
+        $this->db->delete('tasks');
+        $this->db->trans_complete();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
     function get_tasks_by_editor($editor_id, $limit = null)
     {
         $this->db->select('*');

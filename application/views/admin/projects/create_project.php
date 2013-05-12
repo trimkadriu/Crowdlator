@@ -219,7 +219,6 @@ $(document).ready(function() {
 	$("input[name='microtasks']").change(function(){
 		var span_name = $("input[name='microtasks']:checked").val();
 		$('#microtasks_by').val(span_name);
-		$('#break_text').val($("input[name='microtasks']:checked").next().children().val());
 		$('#parent_microtasks').find('div').slideUp();
 		$('.' + span_name).slideDown();
 	});
@@ -231,6 +230,7 @@ $(document).ready(function() {
 
     //First tab click NEXT button
     $("#next_tab").click(function(){
+        $('#break_text').val($("input[name='microtasks']:checked").next().children().val());
         if(form_validate()){
             //get_youtube_token();
             $("#first").slideToggle(800);

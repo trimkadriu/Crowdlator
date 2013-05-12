@@ -26,10 +26,11 @@ class Translate extends CI_Controller {
         if($temp)
             $task_id = $temp[0];
         if(!$task_id)
-            redirect(base_url());
+            redirect();
         $task = $this->tasks_model->get_task_by_id($task_id)[0];
         $project_id = $task->project_id;
-        $project = $this->projects_model->select_project_by_id($project_id)->result()[0];
+        $temp = $this->projects_model->select_project_by_id($project_id)->result();
+        $project = $temp[0];
         if($project->status != "In Translation")
         {
             $this->session->set_flashdata('message_type', 'error');
@@ -114,6 +115,40 @@ class Translate extends CI_Controller {
         );
         $data['return_result'] = $this->recaptcha->is_valid;
         echo json_encode($data);
+    }
+
+    function project()
+    {
+        $temp = func_get_args(0);
+        if($temp)
+            $project_id = $temp[0];
+        if(!$project_id)
+            redirect();
+        $temp = $this->projects_model->select_project_by_id($project_id)->result();
+        $project = $temp[0];
+        if($project)
+        {
+            if($project->status === "In Translation")
+            {
+                $temp = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
+                $tasks = $temp[0];
+                redirect("public/translate/task/".$tasks->id);
+            }
+            elseif($project->status === "In Audition")
+                redirect("public/translate/audio/".$project_id);
+            else
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'This project is not in translation or in audition stage.');
+                redirect();
+            }
+        }
+        else
+        {
+            $this->session->set_flashdata('message_type', 'error');
+            $this->session->set_flashdata('message', 'This project does not exists.');
+            redirect();
+        }
     }
 
 }
