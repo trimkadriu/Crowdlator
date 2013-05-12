@@ -15,6 +15,7 @@ class Pages extends CI_Controller {
 	public function index()
 	{
         $projects = $this->projects_model->get_random_projects(3, array("In Translation", "In Audition"), null);
+        $data['projects'] = null;
         if($projects)
             $data['projects'] = $projects;
 		$this->load->view('pages/home', $data);
@@ -68,6 +69,7 @@ class Pages extends CI_Controller {
 	public function projects()
 	{
         $projects = $this->projects_model->get_random_projects(9, array("In Translation", "In Audition"), null);
+        $data['projects'] = null;
         if($projects)
             $data['projects'] = $projects;
 		$this->load->view('pages/projects', $data);
