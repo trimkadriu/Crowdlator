@@ -34,7 +34,8 @@ class Vote extends CI_Controller {
         get_if_voted_by_id_type($translation_id, "text");
         $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
         $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
-        $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+        $temp1 = $this->projects_model->select_project_by_id($task->project_id)->result();
+        $project = $temp1[0];
         if($translation)
         {
             $data['translate_from'] = $project->translate_from_language;
@@ -71,7 +72,8 @@ class Vote extends CI_Controller {
         }
         get_if_voted_by_id_type($project_id, "audio");
         $audio = $this->audios_model->get_audios(null, $project_id, null, null, null)[0];
-        $project = $this->projects_model->select_project_by_id($project_id)->result()[0];
+        $temp2 = $this->projects_model->select_project_by_id($project_id)->result();
+        $project = $temp2[0];
         if($audio)
         {
             $data['audio_id'] = $audio->audio_id;

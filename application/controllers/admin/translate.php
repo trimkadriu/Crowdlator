@@ -431,7 +431,8 @@ class Translate extends CI_Controller {
                 $data['audios_nr'] = sizeof($audios);
                 for($i = 0; $i < $data['audios_nr']; $i++)
                 {
-                    $project = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result()[0];
+                    $temp = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result();
+                    $project = $temp[0];
                     $data['project_status'][$i] = $project->status;
                     $data['translation_type'] = "audio";
                     $data['id'][$i] = $audios[$i]->id;
@@ -462,7 +463,8 @@ class Translate extends CI_Controller {
                 for($i = 0; $i < $data['translation_nr']; $i++)
                 {
                     $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
-                    $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                    $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
+                    $project = $temp[0];
                     $data['project_status'][$i] = $project->status;
                     $data['translation_type'] = "text";
                     $data['translation_id'][$i] = $translations[$i]->id;
@@ -631,7 +633,8 @@ class Translate extends CI_Controller {
             for($i = 0; $i < $data['drafts_nr']; $i++)
             {
                 $task = $this->tasks_model->get_task_by_id($drafts[$i]->task_id)[0];
-                $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
+                $project = $temp[0];
                 $data['project_name'][$i] = $project->project_name;
                 $data['date_saved'][$i] = $drafts[$i]->date_created;
                 $data['translated_from'][$i] = $project->translate_from_language;
@@ -772,7 +775,8 @@ class Translate extends CI_Controller {
                 for($i = 0; $i < $data['audios_nr']; $i++)
                 {
                     //$task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
-                    $project = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result()[0];
+                    $temp = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result();
+                    $project = $temp[0];
                     $data['id'][$i] = $audios[$i]->id;
                     $data['audio_id'][$i] = $audios[$i]->audio_id;
                     $data['project_name'][$i] = $project->project_name;
@@ -800,7 +804,8 @@ class Translate extends CI_Controller {
                 for($i = 0; $i < $data['translation_nr']; $i++)
                 {
                     $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
-                    $project = $this->projects_model->select_project_by_id($task->project_id)->result()[0];
+                    $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
+                    $project = $temp[0];
                     $data['translation_id'][$i] = $translations[$i]->id;
                     $data['project_name'][$i] = $project->project_name;
                     $data['date_translated'][$i] = $translations[$i]->date_created;
