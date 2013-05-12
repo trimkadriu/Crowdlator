@@ -37,7 +37,11 @@ class Ffmpeg_model extends CI_Model {
             "\" -y -map 0:0 -map 1 -vcodec copy -acodec copy -t ".$video_duration." \"".$final_location.$video_filename."\"";
         exec("\"".$ffmpeg_location."\" ".$params, $result);
         if(file_exists($final_location.$video_filename))
+        {
+            unlink($videos_location.$video_filename);
+            unlink($audios_location.$audio_filename);
             return true;
+        }
         else
             return false;
     }
