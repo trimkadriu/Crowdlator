@@ -6,10 +6,15 @@
  */
 class Youtube_model extends CI_Model {
 
+    private $ds;
+    private $application_location;
+
     function __construct()
     {
         parent:: __construct();
         $this->load->library("curl");
+        $this->ds = DIRECTORY_SEPARATOR;
+        $this->application_location = dirname(__FILE__).$this->ds.'..'.$this->ds;
     }
 
     function get_upload_token()
@@ -148,6 +153,23 @@ class Youtube_model extends CI_Model {
             return false;
         $obj=json_decode($data);
         return $obj;
+    }
+
+    function download_video($project_id, $video_id)
+    {
+        /**
+         * For video formats please refer to:
+         * https://en.wikipedia.org/wiki/YouTube#Quality_and_codecs
+         */
+        $youtubedl_location = $this->application_location.'third_party'.$this->ds.'youtube-dl';
+        $videos_location = $this->application_location.'..'.$this->ds.'videos'.$this->ds;
+        $filename = $project_id."_".$video_id.".mp4";
+        $video_link = "www.youtube.com/watch?v=".$video_id;
+        $params = "-o \"".$videos_location.$filename."\" -f 22/18/34 ".$video_link;
+        exec("python \"".$youtubedl_location."\" ".$params, $result);
+        if(file_exists($videos_location.$filename))
+            return true;
+        return false;
     }
 
 }

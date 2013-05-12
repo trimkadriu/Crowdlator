@@ -14,6 +14,8 @@ class Projects extends CI_Controller {
 		$this->load->model("projects_model");
         $this->load->model("translations_model");
         $this->load->model("youtube_model");
+        $this->load->model("soundcloud_model");
+        $this->load->model("audios_model");
     }
 
 	private function break_text($text, $type, $break_number)
@@ -82,8 +84,10 @@ class Projects extends CI_Controller {
 			//If validation fails
 			if ($this->form_validation->run() == FALSE)
 			{
+                $data['project_status'] = true;
+                echo json_encode($data);
 				$this->session->set_flashdata('message_type', 'error');
-				$this->session->set_flashdata('message', 'Please fill all required form fields in correct format.');
+				$this->session->set_flashdata('message', 'Please fill all required form fields in correct format.<br/>'.validation_errors());
 				redirect('admin/projects/create_project');
 			}
 			else
@@ -100,7 +104,7 @@ class Projects extends CI_Controller {
 				$hashtags = $this->input->post("hashtags", TRUE);
 				//Create Project
 				$create_project = $this->projects_model->create_new($project_name, $project_description,
-                    $translate_from_language, $translate_to_language, $microtasks_by, $break_text, $paste_text, $hashtags);
+                    $translate_from_language, $translate_to_language, $paste_text, $microtasks_by, $break_text, $hashtags);
 				if($create_project)
 				{
 					//Create tasks
@@ -108,7 +112,7 @@ class Projects extends CI_Controller {
 					$project_id = $this->projects_model->select_project_by_name($project_name)->row()->id;
 					foreach($broken_text as $broken) //Create microtask for each text piece
 					{
-					    $create_task = $this->tasks_model->create_new($project_id, $broken);
+					    $this->tasks_model->create_new($project_id, $broken);
 					}
 					//Success
                     $this->session->set_userdata("project_id", $project_id);
@@ -308,7 +312,7 @@ class Projects extends CI_Controller {
         }
     }
 
-    function edit_project()
+    public function edit_project()
     {
         //Check permissions
         if(!check_permissions(get_session_roleid(), 'admin/projects/edit_project'))
@@ -390,7 +394,7 @@ class Projects extends CI_Controller {
     }
 
     // All project tasks list for translators
-    function tasks_list()
+    public function tasks_list()
     {
         //Check permissions
         if(!check_permissions(get_session_roleid(), 'admin/projects/tasks_list'))
@@ -425,7 +429,7 @@ class Projects extends CI_Controller {
     }
 
     // All assigned tasks of an editor user
-    function list_tasks()
+    public function list_tasks()
     {
         //Check permissions
         if(!check_permissions(get_session_roleid(), 'admin/projects/list_tasks'))
@@ -451,7 +455,7 @@ class Projects extends CI_Controller {
         $this->load->view('admin/projects/list_tasks', $data);
     }
 
-    function upload_video()
+    public function upload_video()
     {
         //Check permissions
         if(!check_permissions(get_session_roleid(), 'admin/projects/upload_video'))
@@ -461,7 +465,7 @@ class Projects extends CI_Controller {
         echo json_encode($data);
     }
 
-    function projects_status()
+    public function projects_status()
     {
         if(!check_permissions(get_session_roleid(), 'admin/projects/projects_status'))
             redirect("pages/permission_exception");
@@ -481,17 +485,93 @@ class Projects extends CI_Controller {
             $data['projects_nr'] = sizeof($projects);
             foreach($projects as $key=>$project)
             {
+                $audio = $this->audios_model->get_audios(null, $project->id, null, null, null, 1)[0];
+                $data['project_id'][$key] = $project->id;
                 $data['project_name'][$key] = $project->project_name;
                 $data['project_description'][$key] = $project->project_description;
                 $data['date_created'][$key] = $project->create_date;
                 $data['translate_from'][$key] = $project->translate_from_language;
                 $data['translate_to'][$key] = $project->translate_to_language;
                 $data['status'][$key] = $project->status;
+                $data['original_text'][$key] = $project->text;
+                $data['translated_text'][$key] = $project->translated_text;
                 $data['video_id'][$key] = $project->video_id;
+                if($audio)
+                    $data['audio_id'][$key] = $audio->audio_id;
             }
         }
         $this->load->view("admin/projects/projects_status", $data);
     }
+
+    public function generate_video()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/projects/generate_video'))
+            echo json_encode(array('return_result' => false));
+        $temp = func_get_args(0);
+        if($temp)
+            $project_id = $temp[0];
+        else
+            echo json_encode(array('return_result' => false));
+        $project = $this->projects_model->get_project_by_params($project_id, get_session_user_id(), null, null, null, "Finished")[0];
+        $this->session->set_flashdata('message_type', 'error');
+        if($project)
+        {
+            $this->load->model("ffmpeg_model");
+            if($this->ffmpeg_model->check_already_generated_video($project->id, $project->video_id))
+                echo json_encode(array('return_result' => true));
+            else
+            {
+                if($this->youtube_model->download_video($project->id, $project->video_id))
+                {
+                    $audio = $this->audios_model->get_audios(null, $project->id, null, null, null, 1)[0];
+                    if($this->soundcloud_model->download_track($project_id, $audio->audio_id, $audio->permalink_url))
+                    {
+                        if($this->ffmpeg_model->generate_video($project->id, $project->video_id, $audio->audio_id))
+                        {
+                            echo json_encode(array('return_result' => true));
+                            exit;
+                        }
+                        else
+                        {
+                            $this->session->set_flashdata('message', 'Generating video cannot be done. Please contact administrator.');
+                            echo json_encode(array('return_result' => false));
+                        }
+                    }
+                    else
+                    {
+                        $this->session->set_flashdata('message', 'Audio cannot be downloaded. Please contact administrator.');
+                        echo json_encode(array('return_result' => false));
+                    }
+                }
+                else
+                {
+                    $this->session->set_flashdata('message', 'Video cannot be downloaded. Please contact administrator.');
+                    echo json_encode(array('return_result' => false));
+                }
+            }
+        }
+        else
+        {
+            $this->session->set_flashdata('message', 'There is no such a project.');
+            echo json_encode(array('return_result' => false));
+        }
+    }
+
+    function generate_download_video_link()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/projects/generate_download_video_link'))
+            redirect("pages/permission_exception");
+        $project_id = strip_tags($this->input->get("project_id", true));
+        $video_id = strip_tags($this->input->get("video_id", true));
+        $this->load->helper('download');
+        $ds = DIRECTORY_SEPARATOR;
+        $final_location = dirname(__FILE__).$ds.'..'.$ds.'..'.$ds.'..'.$ds.'final_videos'.$ds;
+        $video_filename = $project_id."_".$video_id.".mp4";
+        $data = file_get_contents($final_location.$video_filename);
+        $name = 'final_video_'.generateRandomString(5).'.mp4';
+        force_download($name, $data);
+    }
+
 }
 
 ?>

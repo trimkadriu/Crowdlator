@@ -56,7 +56,7 @@
                     <?php } ?>
                     <a onclick="prepare_video_modal('<?php echo $project_video_id[$i]; ?>', '<?php echo $project_name[$i]; ?>', $('#description_<?php echo $i; ?>').val());"
                        href="#video_modal" rel="tooltip" data-placement="top" data-original-title="Open video of this project." data-toggle="modal">
-                        <i class="icon-film"></i> See video
+                        <i class="icon-film"></i> Watch video
                     </a>
                     <textarea id="description_<?php echo $i; ?>" style="display: none;">
                         <?php echo strip_quotes(strip_slashes(trim($project_description[$i]))); ?>

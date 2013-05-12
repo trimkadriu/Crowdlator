@@ -11,7 +11,8 @@ class Projects_model extends CI_Model {
         parent::__construct();
     }
 	
-    function create_new($project_name, $project_description, $translate_from_language, $translate_to_language, $microtasks_by, $break_text, $hashtags)
+    function create_new($project_name, $project_description, $translate_from_language, $translate_to_language,
+                        $text, $microtasks_by, $break_text, $hashtags)
     {
 		$this->load->model("users_model");
 		$admin_id = $this->users_model->get_user_by_username(get_session_username())->row()->id;
@@ -26,7 +27,7 @@ class Projects_model extends CI_Model {
 			'microtasks_by' => $microtasks_by,
 			'break_text' => $break_text,
 			'hash_tags' => $hashtags,
-			'create_date' => date('Y-m-d H:i:s'),
+            'text' => $text,
 			'status' => 'In Translation'
 		);
 		$this->db->insert('projects', $data);

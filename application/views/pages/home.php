@@ -46,7 +46,7 @@
     <div class="container marketing" style="padding-left: 20px;">
         <div class="row">
             <?php if(isset($projects)) { ?>
-            <h2 style="padding-left: 20px; margin-bottom: 30px">Some of the projects that are being translated.</h2>
+            <h2 style="padding-left: 20px; margin-bottom: 30px">Projects that are being translated in Crowdlator.</h2>
             <?php foreach($projects as $project) {?>
                 <div class="span4">
                     <div style="position: relative">

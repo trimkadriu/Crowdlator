@@ -28,8 +28,7 @@
                     <a onclick="prepare_modal($(this).next().next().val(), '<?php echo $audio_id[$i]; ?>');"
                       rel="tooltip" data-placement="top" data-original-title="View translation"
                       href="#translation_detail_modal" data-toggle="modal">
-                        <i class="icon-zoom-in"></i>
-                        Review audio
+                        <i class="icon-play-circle"></i> Review audio
                     </a>
                     <textarea style="display: none;"><?php echo $translated_text[$i]; ?></textarea>
                 </td>
