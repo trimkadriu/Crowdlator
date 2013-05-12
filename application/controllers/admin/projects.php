@@ -436,6 +436,8 @@ class Projects extends CI_Controller {
         if(!check_permissions(get_session_roleid(), 'admin/projects/list_tasks'))
             redirect("pages/permission_exception");
         $tasks = $this->tasks_model->get_tasks_by_editor(get_session_user_id());
+        $data = null;
+        $data['tasks'] = false;
         if($tasks)
         {
             for($i = 0; $i < sizeof($tasks); $i++)
@@ -472,6 +474,8 @@ class Projects extends CI_Controller {
             redirect("pages/permission_exception");
         $role = get_user_role();
         $projects = false;
+        $data = null;
+        $data['projects_nr'] = false;
         if($role == "administrator")
         {
             $projects = $this->projects_model->get_project_by_params(null, get_session_user_id(), null, null, null, null);

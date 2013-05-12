@@ -426,6 +426,7 @@ class Translate extends CI_Controller {
             $data['make_active'] = 1;
             $audios = $this->audios_model->get_audios();
             $data['audios_nr'] = false;
+            $data['translation_type'] = "audio";
             if($audios)
             {
                 $data['audios_nr'] = sizeof($audios);
@@ -434,7 +435,6 @@ class Translate extends CI_Controller {
                     $temp = $this->projects_model->select_project_by_id($audios[$i]->project_id)->result();
                     $project = $temp[0];
                     $data['project_status'][$i] = $project->status;
-                    $data['translation_type'] = "audio";
                     $data['id'][$i] = $audios[$i]->id;
                     $data['project_name'][$i] = $project->project_name;
                     $data['date_created'][$i] = $audios[$i]->date_created;
@@ -449,14 +449,15 @@ class Translate extends CI_Controller {
                     $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", null, 1);
                     $data['voted'][$i] = $this->votes_model->get_if_user_voted(null, $audios[$i]->id, get_session_user_id(), "audio");
                 }
-                $this->load->view("admin/audios/vote_audios", $data);
             }
+            $this->load->view("admin/audios/vote_audios", $data);
         }
         else
         {
             $data['make_active'] = 0;
             $translations = $this->translations_model->get_all_translations();
             $data['translation_nr'] = false;
+            $data['translation_type'] = "text";
             if($translations)
             {
                 $data['translation_nr'] = sizeof($translations);
@@ -466,7 +467,6 @@ class Translate extends CI_Controller {
                     $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
                     $project = $temp[0];
                     $data['project_status'][$i] = $project->status;
-                    $data['translation_type'] = "text";
                     $data['translation_id'][$i] = $translations[$i]->id;
                     $data['project_name'][$i] = $project->project_name;
                     $data['date_translated'][$i] = $translations[$i]->date_created;
@@ -480,8 +480,8 @@ class Translate extends CI_Controller {
                     $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
                     $data['voted'][$i] = $this->votes_model->get_if_user_voted($translations[$i]->id, null, get_session_user_id(), "text");
                 }
-                $this->load->view("admin/translations/vote_translations", $data);
             }
+            $this->load->view("admin/translations/vote_translations", $data);
         }
     }
 
