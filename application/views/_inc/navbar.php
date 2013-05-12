@@ -12,7 +12,7 @@
           <ul class="nav">
             <li class="divider-vertical" style="height:50px;"> </li>
             <li><a href="<?php echo base_url().'pages/register'; ?>">Register</a></li>
-            <li><a href="<?php echo base_url().'pages/translations'; ?>">Translations</a></li>
+            <li><a href="<?php echo base_url().'pages/projects'; ?>">Projects</a></li>
             <li class="dropdown" style="cursor:pointer"> <a data-target="#"  class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="<?php echo base_url().'pages/faq'; ?>">Frequently asked questions</a></li>

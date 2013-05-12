@@ -185,7 +185,7 @@ class Translations_model extends CI_Model {
             return false;
     }
 
-    function get_translations_by_task_ids($task_ids, $limit, $reviewed = null, $approved = null)
+    function get_translations_by_task_ids($task_ids, $limit = null, $reviewed = null, $approved = null)
     {
         $this->db->select('*');
         $this->db->from('translations');

@@ -20,6 +20,7 @@ $config['youtube_source'] = "Crowdlator testing environment"; // A short string 
 // Google Developer Key
 $config['youtube_developer_key'] = "AI39si56K64hGlavx6j60-cSqfmsRS7Gm4PnEX3gXcEXZ0pf0hd-nwE8qWRLx8gPdt70uiGhfMB5Uur4t5d-eOJpnJGl6q2t3A";
 // IMPORTANT: Please include HTTP or HTTPS protocol in the redirect URL after a successful upload
+// Please do not change the other part of the URL until you know what you are doing. Change only the host and Crowdlator path.
 $config['youtube_next_url'] = "http://localhost/crowdlator/admin/projects/check_project";
 
 /*

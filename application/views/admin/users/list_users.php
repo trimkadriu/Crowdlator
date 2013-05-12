@@ -20,9 +20,9 @@
             <?php if($users != null) { $index = 0; foreach($users as $user) { ?>
             <tr>
                 <!--<td><?php /*echo $user->id; */?></td>-->
-                <td id="user_fullname">
+                <td>
                     <span style="display: none;"><?php echo $user->date_created; ?></span>
-                    <?php echo $user->fullname; ?><br/><?php echo $user->date_created; ?>
+                    <span id="user_fullname"><?php echo $user->fullname; ?></span><br/><?php echo $user->date_created; ?>
                 </td>
                 <td><?php echo $user->country; ?></td>
                 <td id="user_email"><?php echo $user->email; ?></td>
@@ -46,10 +46,10 @@
 <div class="modal hide fade" id="change_role_modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Change user role</h3>
+        <h3>Change users role</h3>
     </div>
     <div class="modal-body">
-        <p>Select role for <strong><span id="fullname"></span></strong></p>
+        <p>Change role for <strong><span id="fullname"></span></strong></p>
         <p>
             <label>Roles: </label>
             <select id="roles">
