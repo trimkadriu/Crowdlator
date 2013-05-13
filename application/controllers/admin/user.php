@@ -135,7 +135,8 @@ class User extends CI_Controller {
                 $translations = $this->translations_model->get_translations_by_task_ids($ids, false);//print_r($translations);exit;
                 for($i = 0; $i < sizeof($translations); $i++)
                 {
-                    $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $temp = $this->tasks_model->get_task_by_id($translations[$i]->task_id);
+                    $task = $temp[0];
                     $temp_proj = $this->projects_model->select_project_by_id($task->project_id)->result();
                     $project = $temp_proj[0];
                     $data['translations'][$i] = $translations[$i];
@@ -189,7 +190,8 @@ class User extends CI_Controller {
             $data['translation_nr'] = sizeof($translations);
             for($i = 0; $i < $data['translation_nr']; $i++)
             {
-                $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                $temp1 = $this->tasks_model->get_task_by_id($translations[$i]->task_id);
+                $task = $temp1[0];
                 $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
                 $project = $temp[0];
                 $data['translation_id'][$i] = $translations[$i]->id;

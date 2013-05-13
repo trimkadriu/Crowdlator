@@ -37,7 +37,9 @@ class Public_model extends CI_Model {
                 redirect("public/translate/task/".$task_id);
             }
             $translated_text = strip_tags($this->input->post("translated", TRUE));
-            $text = $this->tasks_model->get_task_by_id($task_id)[0]->text;
+            $temp = $this->tasks_model->get_task_by_id($task_id);
+            $text = $temp[0];
+            $text = $text->text;
             $text_size = strlen($text);
             $translated_text_size = strlen($translated_text);
             // Validate translation text
