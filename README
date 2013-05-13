@@ -1,18 +1,18 @@
-=========================================================
+=================================================================================
                         CROWDLATOR
-=========================================================
+=================================================================================
 
 
 
 INFORMATION
-------------------------------------
+---------------------------------------------------------------------------------
 Version 1.0
 Author: Trim Kadriu <trim.kadriu@hotmail.com>
 
 
 
 DESCRIPTION
-------------------------------------
+---------------------------------------------------------------------------------
 - Crowdlator is an online platform for multimedia translation (Re-rendering videos
 with translated voice over by crowd). It is a project by Al Jazeera intended to
 help journalists to translate videos by crowd. It is implemented by UNICEF
@@ -21,7 +21,7 @@ Innovations Lab.
 
 
 DEPENDENCIES
-------------------------------------
+---------------------------------------------------------------------------------
 - Apache 2.2
 - PHP 5.2 (tested on 5.4.7)
 - MySQL 5.5
@@ -37,7 +37,7 @@ DEPENDENCIES
 
 
 INSTALLATION
-------------------------------------
+---------------------------------------------------------------------------------
 - Copy all files in web server
 - Make sure that youtube_model.php, soundcloud_model.php, ffmpeg_model.php
   (in application/models folder) have execute rights
@@ -70,7 +70,7 @@ INSTALLATION
 
 
 TO BE REVIEWED IN NEXT VERSION
-------------------------------------
+---------------------------------------------------------------------------------
 - Add more project details in drafts and translate task page
 - At all datatables add icon for sorting ASC-DESC and make cursor to pointer
 - Add JavaScript disable exception
@@ -83,6 +83,6 @@ TO BE REVIEWED IN NEXT VERSION
 
 
 LICENSE
-------------------------------------
+---------------------------------------------------------------------------------
 This is service is offered free of charge. This platform is build over OpenSource
 software.
