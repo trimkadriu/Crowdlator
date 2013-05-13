@@ -27,7 +27,8 @@ class Translate extends CI_Controller {
             $task_id = $temp[0];
         if(!$task_id)
             redirect();
-        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+        $temp1 = $this->tasks_model->get_task_by_id($task_id);
+        $task = $temp1[0];
         $project_id = $task->project_id;
         $temp = $this->projects_model->select_project_by_id($project_id)->result();
         $project = $temp[0];
@@ -74,7 +75,8 @@ class Translate extends CI_Controller {
         {
             redirect(base_url('admin/translate/audio_audition/'.$project_id));
         }
-        $project = $this->projects_model->get_project_by_params($project_id, null, null, null, null, "In Audition")[0];
+        $temp = $this->projects_model->get_project_by_params($project_id, null, null, null, null, "In Audition");
+        $project = $temp[0];
         if($project)
         {
             $token = $this->soundcloud_model->get_access_token();

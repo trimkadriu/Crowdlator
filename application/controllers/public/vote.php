@@ -32,8 +32,10 @@ class Vote extends CI_Controller {
             redirect(base_url('admin/translate/vote_translations'));
         }
         get_if_voted_by_id_type($translation_id, "text");
-        $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
-        $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
+        $temp2 = $this->translations_model->get_translation_by_id($translation_id);
+        $translation = $temp2[0];
+        $temp3 = $this->tasks_model->get_task_by_id($translation->task_id);
+        $task = $temp3[0];
         $temp1 = $this->projects_model->select_project_by_id($task->project_id)->result();
         $project = $temp1[0];
         if($translation)
@@ -71,7 +73,8 @@ class Vote extends CI_Controller {
             redirect(base_url('admin/translate/vote_translations/1'));
         }
         get_if_voted_by_id_type($project_id, "audio");
-        $audio = $this->audios_model->get_audios(null, $project_id, null, null, null)[0];
+        $temp3 = $this->audios_model->get_audios(null, $project_id, null, null, null);
+        $audio = $temp3[0];
         $temp2 = $this->projects_model->select_project_by_id($project_id)->result();
         $project = $temp2[0];
         if($audio)

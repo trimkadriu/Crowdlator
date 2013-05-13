@@ -490,7 +490,8 @@ class Projects extends CI_Controller {
             $data['projects_nr'] = sizeof($projects);
             foreach($projects as $key=>$project)
             {
-                $audio = $this->audios_model->get_audios(null, $project->id, null, null, null, 1)[0];
+                $temp = $this->audios_model->get_audios(null, $project->id, null, null, null, 1);
+                $audio = $temp[0];
                 $data['project_id'][$key] = $project->id;
                 $data['project_name'][$key] = $project->project_name;
                 $data['project_description'][$key] = $project->project_description;
@@ -517,7 +518,8 @@ class Projects extends CI_Controller {
             $project_id = $temp[0];
         else
             echo json_encode(array('return_result' => false));
-        $project = $this->projects_model->get_project_by_params($project_id, get_session_user_id(), null, null, null, "Finished")[0];
+        $temp1 = $this->projects_model->get_project_by_params($project_id, get_session_user_id(), null, null, null, "Finished");
+        $project = $temp1;
         $this->session->set_flashdata('message_type', 'error');
         if($project)
         {
@@ -528,7 +530,8 @@ class Projects extends CI_Controller {
             {
                 if($this->youtube_model->download_video($project->id, $project->video_id))
                 {
-                    $audio = $this->audios_model->get_audios(null, $project->id, null, null, null, 1)[0];
+                    $temp2 = $this->audios_model->get_audios(null, $project->id, null, null, null, 1);
+                    $audio = $temp2[0];
                     if($this->soundcloud_model->download_track($project_id, $audio->audio_id, $audio->permalink_url))
                     {
                         if($this->ffmpeg_model->generate_video($project->id, $project->video_id, $audio->audio_id))

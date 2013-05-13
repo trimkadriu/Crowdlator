@@ -246,7 +246,8 @@ class Translate extends CI_Controller {
                     for($i = 0; $i < $data['translations_nr']; $i++)
                     {
                         $task_id = $translations[$i]->task_id;
-                        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+                        $temp1 = $this->tasks_model->get_task_by_id($task_id);
+                        $task = $temp1[0];
                         $project_id = $task->project_id;
                         $temp = $this->projects_model->select_project_by_id($project_id)->result();
                         $projects[$i] = $temp[0];
@@ -306,7 +307,8 @@ class Translate extends CI_Controller {
                     for($i = 0; $i < $data['translations_nr']; $i++)
                     {
                         $task_id = $translations[$i]->task_id;
-                        $task = $this->tasks_model->get_task_by_id($task_id)[0];
+                        $temp1 = $this->tasks_model->get_task_by_id($task_id);
+                        $task = $temp1[0];
                         $project_id = $task->project_id;
                         $temp = $this->projects_model->select_project_by_id($project_id)->result();
                         $projects[$i] = $temp[0];
@@ -463,7 +465,8 @@ class Translate extends CI_Controller {
                 $data['translation_nr'] = sizeof($translations);
                 for($i = 0; $i < $data['translation_nr']; $i++)
                 {
-                    $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $temp1 = $this->tasks_model->get_task_by_id($translations[$i]->task_id);
+                    $task = $temp1[0];
                     $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
                     $project = $temp[0];
                     $data['project_status'][$i] = $project->status;
@@ -496,7 +499,8 @@ class Translate extends CI_Controller {
             $result = false;
             if($translation_type == "text")
             {
-                $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
+                $temp1 = $this->translations_model->get_translation_by_id($translation_id);
+                $translation = $temp1[0];
                 $temp = $this->tasks_model->get_task_by_id($translation->task_id);
                 $task = $temp[0];
                 $project_id = $task->project_id;
@@ -504,7 +508,8 @@ class Translate extends CI_Controller {
             }
             elseif($translation_type == "audio")
             {
-                $audio = $this->audios_model->get_audios(null, null, $translation_id, null, null, null)[0];
+                $temp2 = $this->audios_model->get_audios(null, null, $translation_id, null, null, null);
+                $audio = $temp2[0];
                 $project_id = $audio->task_id;
                 $return = 1; $return_url = "audio";
             }
@@ -544,7 +549,11 @@ class Translate extends CI_Controller {
                             $this->session->set_flashdata('message_type', 'error');
                             $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
                             if($translation_type == "audio")
-                                $translation_id = $this->audios_model->get_audios($translation_id, null, null, null, null)[0]->project_id;
+                            {
+                                $temp3 = $this->audios_model->get_audios($translation_id, null, null, null, null);
+                                $translation_id = $temp3[0];
+                                $translation_id = $translation_id->project_id;
+                            }
                             redirect("public/vote/".$return_url."/".$translation_id);
                         }
                         get_if_voted_by_id_type($translation_id, $translation_type);
@@ -632,7 +641,8 @@ class Translate extends CI_Controller {
             $data['drafts_nr'] = sizeof($drafts);
             for($i = 0; $i < $data['drafts_nr']; $i++)
             {
-                $task = $this->tasks_model->get_task_by_id($drafts[$i]->task_id)[0];
+                $temp1 = $this->tasks_model->get_task_by_id($drafts[$i]->task_id);
+                $task = $temp1[0];
                 $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
                 $project = $temp[0];
                 $data['project_name'][$i] = $project->project_name;
@@ -702,7 +712,8 @@ class Translate extends CI_Controller {
             $draft_id = $temp[0];
         if(!$draft_id)
             redirect("admin/user/dashboard");
-        $draft = $this->drafts_model->get_draft_by_id($draft_id, get_session_user_id())[0];
+        $temp2 = $this->drafts_model->get_draft_by_id($draft_id, get_session_user_id());
+        $draft = $temp2[0];
         $task_id = $draft->task_id;
         $temp = $this->tasks_model->get_task_by_id($task_id);
         $task = $temp[0];
@@ -803,7 +814,8 @@ class Translate extends CI_Controller {
                 $data['translation_nr'] = sizeof($translations);
                 for($i = 0; $i < $data['translation_nr']; $i++)
                 {
-                    $task = $this->tasks_model->get_task_by_id($translations[$i]->task_id)[0];
+                    $temp1 = $this->tasks_model->get_task_by_id($translations[$i]->task_id);
+                    $task = $temp1[0];
                     $temp = $this->projects_model->select_project_by_id($task->project_id)->result();
                     $project = $temp[0];
                     $data['translation_id'][$i] = $translations[$i]->id;
@@ -833,7 +845,8 @@ class Translate extends CI_Controller {
             $translation_id = $translations[0];
         if(!$translation_id)
             redirect("admin/user/dashboard");
-        $translation = $this->translations_model->get_translation_by_id($translation_id)[0];
+        $temp = $this->translations_model->get_translation_by_id($translation_id);
+        $translation = $temp[0];
         $this->session->set_flashdata('message_type', 'error');
         if($translation->approved == 0)
         {
@@ -848,7 +861,8 @@ class Translate extends CI_Controller {
                 $this->session->set_flashdata('message_type', 'success');
                 $this->session->set_flashdata('message', 'That translation was choosen the best.');
                 //Check project status
-                $task = $this->tasks_model->get_task_by_id($translation->task_id)[0];
+                $temp = $this->tasks_model->get_task_by_id($translation->task_id);
+                $task = $temp[0];
                 $project_id = $task->project_id;
                 $status = check_project_status($project_id);
                 if($status)
@@ -866,7 +880,8 @@ class Translate extends CI_Controller {
                             $this->votes_model->delete_votes(null, $pr_translation->id, null, null, "text", null, null, null);
                         }
                         //Save final text
-                        $trans = $this->translations_model->get_translation_by_params(null, $pr_task->id, null, null, null, null, "1")[0];
+                        $temp = $this->translations_model->get_translation_by_params(null, $pr_task->id, null, null, null, null, "1");
+                        $trans = $temp[0];
                         if($trans)
                             $text = $text." ".$trans->translated_text;
                     }
@@ -889,7 +904,8 @@ class Translate extends CI_Controller {
             $audio_id = $audios[0];
         if(!$audio_id)
             redirect("admin/user/dashboard");
-        $audio = $this->audios_model->get_audios($audio_id, null, null, null, null, 0)[0];
+        $temp = $this->audios_model->get_audios($audio_id, null, null, null, null, 0);
+        $audio = $temp[0];
         $this->session->set_flashdata('message_type', 'error');
         if($audio)
         {
