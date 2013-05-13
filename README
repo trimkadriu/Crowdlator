@@ -13,9 +13,10 @@ Author: Trim Kadriu <trim.kadriu@hotmail.com>
 
 DESCRIPTION
 ------------------------------------
-- Crowdlator is an online platform for multimedia translation (Re-rendering videos with translated voice over by crowd).
-It is a project by Al Jazeera intended to help journalists to translate videos by crowd.
-It is implemented by UNICEF Innovations Lab.
+- Crowdlator is an online platform for multimedia translation (Re-rendering videos
+with translated voice over by crowd). It is a project by Al Jazeera intended to
+help journalists to translate videos by crowd. It is implemented by UNICEF
+Innovations Lab.
 
 
 
@@ -38,9 +39,11 @@ DEPENDENCIES
 INSTALLATION
 ------------------------------------
 - Copy all files in web server
-- Make sure that youtube_model.php, soundcloud_model.php, ffmpeg_model.php (in application/models folder) have execute rights
+- Make sure that youtube_model.php, soundcloud_model.php, ffmpeg_model.php
+  (in application/models folder) have execute rights
 - Make sure that you have writing rights on audios, videos, and final_videos folders.
-- Create database with name of "crowdlator" and import structure and initial data from SETUP_DATA/crowdlator.sql
+- Create database with name of "crowdlator" and import structure and initial data
+  from SETUP_DATA/crowdlator.sql
 - Initial users for each role will be created.
 
     Username    |   Password
@@ -50,11 +53,16 @@ INSTALLATION
     supereditor |   password
     translator  |   password
 
-- Open .htaccess in line 3 and make sure this is the correct path where you uploaded the platform.
-- Open config.php, soundcloud_config.php, youtube_config.php, database.php and update each line according to your needs.
-  Note that you have to create a Soundcloud and Youtube account. And for both of them you have to create an app.
-  For Youtube please follow this link: https://code.google.com/apis/youtube/dashboard/gwt/index.html
-  For Soundcloud please follow this link: http://soundcloud.com/you/apps
+- Open .htaccess in line 3 and make sure this is the correct path where you uploaded
+  the platform.
+- Open config.php, soundcloud_config.php, youtube_config.php, database.php and update
+  each line according to your needs.
+  Note that you have to create a Soundcloud and Youtube account. And for both of them
+  you have to create an app.
+  For Youtube please follow this link:
+  https://code.google.com/apis/youtube/dashboard/gwt/index.html
+  For Soundcloud please follow this link:
+  http://soundcloud.com/you/apps
   After creating apps, please fill the corresponding data to config files.
 - Install SoundCloud library for Python 2.7 on server
   Download link: https://pypi.python.org/pypi/soundcloud/0.3.6
@@ -76,4 +84,5 @@ TO BE REVIEWED IN NEXT VERSION
 
 LICENSE
 ------------------------------------
-This is service is offered free of charge. This platform is build over OpenSource software.
+This is service is offered free of charge. This platform is build over OpenSource
+software.
