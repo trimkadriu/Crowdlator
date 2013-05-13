@@ -519,7 +519,7 @@ class Translate extends CI_Controller {
             if($translation_type == "text")
                 if($project->status != "In Translation")
                     redirect();
-            if($translation_type == "text")
+            elseif($translation_type == "audio")
                 if($project->status != "In Audition")
                     redirect();
                 //Some validations
