@@ -55,7 +55,7 @@
                                 </a>
                             </span><br/>
                             <span rel="tooltip" data-placement="top" data-original-title="Ask people to record audio for this project by sharing it on Twitter.">
-                                <a href="#" onclick="twitter_share('<?php echo urlencode(base_url("public/translate/audio")."/".$project->id) ?>', $(this).parent().attr('data-original-title')) ">
+                                <a href="#" onclick="twitter_share('<?php echo urlencode(base_url("public/translate/audio")."/".$project->id) ?>', 'Contribute by recording audio for this project', '<?php echo urlencode($project->hash_tags); ?>') ">
                                     <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
                                          style="width: 13px; height: 13px"/> Twitter
                                 </a>
@@ -71,8 +71,8 @@
                                          style="width: 13px; height: 13px"/> Facebook
                                 </a>
                             </span><br/>
-                            <span rel="tooltip" data-placement="top" data-original-title="Ask people to translate text for this project by sharing it on Twitter.">
-                                <a href="#" onclick="twitter_share('<?php echo urlencode(base_url("public/translate/project")."/".$project->id) ?>', $(this).parent().attr('data-original-title')) ">
+                            <span rel="tooltip" data-placement="top" data-original-title="Ask people to record audio for this project by sharing it on Twitter.">
+                                <a href="#" onclick="twitter_share('<?php echo urlencode(base_url("public/translate/project")."/".$project->id) ?>', 'Contribute by translating text for this project.', '<?php echo urlencode($project->hash_tags); ?>') ">
                                     <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
                                          style="width: 13px; height: 13px"/> Twitter
                                 </a>
@@ -147,8 +147,8 @@
         window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '', 'width=600,height=300');
     }
 
-    function twitter_share(url, text) {
-        window.open('https://twitter.com/intent/tweet?text=' + text + ' ' + url, '', 'width=600,height=300');
+    function twitter_share(url, text, hash) {
+        window.open('https://twitter.com/intent/tweet?text=' + text + ' '+ hash + ' ' + url, '', 'width=600,height=300');
     }
 </script>
 <?php $this->load->view('_inc/footer_base'); ?>

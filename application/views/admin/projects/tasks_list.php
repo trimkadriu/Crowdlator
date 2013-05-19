@@ -45,7 +45,7 @@
                                  rel="<?php echo base_url("public/translate/task/".$task->id); ?>"/> Facebook
                         </a><br/>
                         <a href="#" rel="tooltip" data-placement="top" data-original-title="Ask people to translate text for this task by sharing it on Twitter."
-                           onclick="twitter_share('<?php echo urlencode(base_url("public/translate/task")."/".$task->id) ?>', $(this).attr('data-original-title'))">
+                           onclick="twitter_share('<?php echo urlencode(base_url("public/translate/task")."/".$task->id) ?>', 'Contribute by translating this task', '<?php echo urlencode($hash); ?>')">
                             <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
                                  style="width: 16px; height: 16px"
                                  rel="<?php echo base_url("public/translate/task/".$task->id); ?>"/> Twitter
@@ -66,8 +66,8 @@
         window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '', 'width=600,height=300');
     }
 
-    function twitter_share(url, text) {
-        window.open('https://twitter.com/intent/tweet?text=' + text + ' ' + url, '', 'width=600,height=300');
+    function twitter_share(url, text, hash) {
+        window.open('https://twitter.com/intent/tweet?text=' + text + ' ' + hash + ' ' + url, '', 'width=600,height=300');
     }
 </script>
 <?php $this->load->view('_inc/datatables'); ?>

@@ -235,7 +235,7 @@
     }
 
     function twitter_share() {
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by recording audio for this translated text') +
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by recording audio for this translated text <?php echo $hash; ?> ') +
                 encodeURIComponent(window.location.href),
                 '', 'width=600,height=300');
     }

@@ -417,6 +417,7 @@ class Projects extends CI_Controller {
             redirect('admin/projects/list_projects');
         }
         $data['project_name'] = $temp[0]->project_name;
+        $data['hash'] = $temp[0]->hash_tags;
         $data['tasks'] = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
         $this->load->model("translations_model");
         for($i = 0; $i <= sizeof($data['tasks']) - 1; $i++)
@@ -449,6 +450,7 @@ class Projects extends CI_Controller {
                     $data['tasks'][$i] = $tasks[$i];
                     $data['projectname'][$i] = $project[0]->project_name;
                     $data['date_created'][$i] = $project[0]->create_date;
+                    $data['hash'][$i] = $project[0]->hash_tags;
                     $task_id = $data['tasks'][$i]->id;
                     $temp = $this->translations_model->count_translations($task_id);
                     $data['count'][$i] = $temp[0]->nr;

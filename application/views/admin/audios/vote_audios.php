@@ -150,7 +150,7 @@
     }
 
     function twitter_share(id) {
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation ') +
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation <?php echo $twitter_hash_tag; ?> ') +
                 encodeURIComponent('<?php echo base_url("public/vote/audio")."/"; ?>' + id),
                 '', 'width=600,height=300');
     }

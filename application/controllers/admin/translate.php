@@ -447,6 +447,7 @@ class Translate extends CI_Controller {
                     $data['project_video_id'][$i] = $project->video_id;
                     $data['project_description'][$i] = $project->project_description;
                     $data['project_id'][$i] = $project->id;
+                    $data['twitter_hash_tag'] = $project->hash_tags;
                     $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", 1, null);
                     $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, null, $audios[$i]->id, null, "audio", null, 1);
                     $data['voted'][$i] = $this->votes_model->get_if_user_voted(null, $audios[$i]->id, get_session_user_id(), "audio");
@@ -479,6 +480,7 @@ class Translate extends CI_Controller {
                     $data['translated'][$i] = $translations[$i]->translated_text;
                     $data['project_video_id'][$i] = $project->video_id;
                     $data['project_description'][$i] = $project->project_description;
+                    $data['hash'][$i] = $project->hash_tags;
                     $data['good_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", "1", null);
                     $data['bad_votes'][$i] = $this->votes_model->get_votes_count(null, $translations[$i]->id, null, null, "text", null, "1");
                     $data['voted'][$i] = $this->votes_model->get_if_user_voted($translations[$i]->id, null, get_session_user_id(), "text");
@@ -1002,6 +1004,7 @@ class Translate extends CI_Controller {
         $data['video_duration'] = $this->youtube_model->get_video_details($project->video_id)->data->duration;
         $data['project_description'] = $project->project_description;
         $data['translated_text'] = $project->translated_text;
+        $data['twitter_hash_tag'] = $project->hash_tags;
         //$data['access_token'] = $token;
         $data['client_id'] = $this->config->item("soundcloud_client_id");
         $data['redirect_url'] = $this->config->item("soundcloud_redirect_url");
