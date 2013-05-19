@@ -106,7 +106,7 @@
     }
 
     function twitter_share() {
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation') +
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation <?php echo $hash; ?> ') +
                 encodeURIComponent(window.location.href),
                 '', 'width=600,height=300');
     }

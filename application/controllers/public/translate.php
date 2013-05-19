@@ -51,6 +51,7 @@ class Translate extends CI_Controller {
             $data['project_description'] = $project->project_description;
             $data['text'] = $task->text;
             $data['task_id'] = $task_id;
+            $data['hash'] = $project->hash_tags;
             $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
 //            $data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
             $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
@@ -91,6 +92,7 @@ class Translate extends CI_Controller {
             $data['project_video_id'] = $project->video_id;
             $data['video_duration'] = $this->youtube_model->get_video_details($project->video_id)->data->duration;
             $data['project_description'] = $project->project_description;
+            $data['hash'] = $project->hash_tags;
             $data['translated_text'] = $project->translated_text;
             //$data['access_token'] = $token;
             $data['client_id'] = $this->config->item("soundcloud_client_id");

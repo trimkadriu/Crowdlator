@@ -68,7 +68,7 @@
                         </a>
                     </span><br/>
                     <span rel="tooltip" data-placement="top" data-original-title="Ask to vote by sharing it on Twitter.">
-                        <a href="#" onclick="twitter_share('<?php echo $translation_id[$i]; ?>')">
+                        <a href="#" onclick="twitter_share('<?php echo $translation_id[$i]; ?>', '<?php echo urlencode($hash[$i]); ?>')">
                             <img src="<?php echo base_url("template/img/extra_icons/glyphicons_411_twitter.png"); ?>"
                                  style="width: 13px; height: 13px"/> Twitter
                         </a>
@@ -148,8 +148,8 @@
                 '', 'width=600,height=300');
     }
 
-    function twitter_share(id) {
-        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation ') +
+    function twitter_share(id, hash) {
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('Please contribute by voting this translation ') + hash + ' ' +
                 encodeURIComponent('<?php echo base_url("public/vote/translation")."/"; ?>' + id),
                 '', 'width=600,height=300');
     }
