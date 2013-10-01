@@ -6,7 +6,7 @@
 
 INFORMATION
 ---------------------------------------------------------------------------------
-Version 1.2
+Version 1.3
 Author: Trim Kadriu <trim.kadriu@hotmail.com>
 
 
@@ -69,7 +69,7 @@ INSTALLATION
   - For Youtube please follow this link:
   URL: https://code.google.com/apis/youtube/dashboard/gwt/index.html
   After creating the app you have to authorize access to your Google Account with
-  specific password (and use that password for connection Crowdlator with Youtube API)
+  specific password (and use that password to connect Crowdlator with Youtube API)
   To do this, first you have to enable 2-Step Authentication.
   Please follow Google documentation:
   1) https://support.google.com/accounts/answer/185839?hl=en&ref_topic=1099588
