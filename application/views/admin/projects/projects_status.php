@@ -40,11 +40,13 @@
                         </div>
                         <?php if($status[$i] == "Finished") { ?>
                         <script>$("#row_<?php echo $project_id[$i]; ?> td:nth-child(4)").find('div.progress').removeClass('active progress-striped');</script>
-                        <a onclick="prepare_final_video_modal('<?php echo $project_id[$i]; ?>', '<?php echo $video_id[$i]; ?>');"
-                           href="#final_video_modal" rel="tooltip" data-placement="top" data-original-title="Generate final video."
-                           data-toggle="modal" class="btn" style="margin-bottom: 5px;">
-                            <i class="icon-download"></i> Download Final Video
-                        </a><br/>
+                            <?php if(check_permissions(get_session_roleid(), 'admin/projects/generate_video')) { ?>
+                            <a onclick="prepare_final_video_modal('<?php echo $project_id[$i]; ?>', '<?php echo $video_id[$i]; ?>');"
+                               href="#final_video_modal" rel="tooltip" data-placement="top" data-original-title="Generate final video."
+                               data-toggle="modal" class="btn" style="margin-bottom: 5px;">
+                                <i class="icon-download"></i> Download Final Video
+                            </a><br/>
+                            <?php } ?>
                         <?php } ?>
                     </td>
                     <td><?php echo ucfirst(strtolower($status[$i])); ?></td>
@@ -159,6 +161,7 @@
         $("[rel=tooltip]").tooltip();
 
         $("#generate_video").click(function () {
+            $(this).attr("disabled", "disabled")
             $("#generate_video_progress").show();
             id = $("#generate_video_project_id").val();
             video_id = $("#generate_video_video_id").val();

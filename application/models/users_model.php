@@ -115,6 +115,29 @@ class Users_model extends CI_Model {
 		else
 			return true;
 	}
+
+    function get_user($id = null, $fullname = null, $city = null, $country = null, $username = null, $email = null)
+    {
+        $this->db->select('*');
+        $this->db->from('users');
+        if($id)
+            $this->db->where('id', $id);
+        if($fullname)
+            $this->db->where('fullname', $fullname);
+        if($city)
+            $this->db->where('city', $city);
+        if($country)
+            $this->db->where('country', $country);
+        if($username)
+            $this->db->where('username', $username);
+        if($email)
+            $this->db->where('email', $email );
+        $query = $this->db->get();
+        if($query->num_rows() == 0)
+            return false;
+        else
+            return $query->result();
+    }
 	
 	function get_user_by_username($username)
 	{

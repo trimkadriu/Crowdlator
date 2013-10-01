@@ -125,7 +125,7 @@ function get_if_voted_by_id_type($id, $type)
     //Read if it has cookies
     $cookie = false;
     if(isset($_COOKIE["crowdlator-".$id."-".$type]))
-        $cookie = $_COOKIE['vote'];
+        $cookie = $_COOKIE["crowdlator-".$id."-".$type];
     if($cookie)
     {
         $CI =& get_instance();
