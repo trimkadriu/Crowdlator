@@ -512,7 +512,7 @@ class Translate extends CI_Controller {
             {
                 $temp2 = $this->audios_model->get_audios(null, null, $translation_id, null, null, null);
                 $audio = $temp2[0];
-                $project_id = $audio->task_id;
+                $project_id = $audio->project_id;
                 $return = 1; $return_url = "audio";
             }
             //Validate if project is in translation stage

@@ -50,8 +50,12 @@ class Settings extends CI_Controller {
                 $email = $this->input->post("email", TRUE);
 
                 //Check user email if already exists
-                $does_email_exists = $this->users_model->check_user_by_email($email);
-                if($does_email_exists)
+                $temp1 = $this->users_model->get_user(null, null, null, null, null, $email);
+                $temp2 = $this->users_model->get_user_by_id($user_id);
+                $does_email_exists = $temp1[0];
+                $this_user= $temp2[0];
+
+                if($does_email_exists->email != $this_user->email)
                 {
                     $this->session->set_flashdata('message_type', 'error');
                     $this->session->set_flashdata('message', 'This email is being used by another user');

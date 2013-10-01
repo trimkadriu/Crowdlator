@@ -33,8 +33,8 @@ class Register extends CI_Controller {
 			$city = $this->input->post("city", TRUE);
 			$country = $this->input->post("country", TRUE);
 			$username = $this->input->post("username", TRUE);
-			$password = $this->input->post("passowrd");
-			$confirm_password = $this->input->post("confirm_password");
+            $password = $this->input->post("confirm_password");
+            //$confirm_password = $this->input->post("confirm_password");
 			$email = $this->input->post("email", TRUE);
 			
 			$this->load->model('users_model');

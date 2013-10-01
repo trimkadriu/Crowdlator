@@ -228,7 +228,9 @@ INSERT INTO `roles_x_permissions` (`id_role`, `id_permission`) VALUES
 (4, 31),
 (4, 33),
 (1, 34),
-(1, 35);
+(1, 35),
+(4, 34),
+(4, 35);
 
 -- --------------------------------------------------------
 
@@ -383,7 +385,7 @@ ALTER TABLE `users`
 -- Constraints for table `votes`
 --
 ALTER TABLE `votes`
-  ADD CONSTRAINT `votes_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `votes_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `votes_ibfk_4` FOREIGN KEY (`translation_id`) REFERENCES `translations` (`id`),
   ADD CONSTRAINT `votes_ibfk_5` FOREIGN KEY (`audio_id`) REFERENCES `audios` (`id`);
 

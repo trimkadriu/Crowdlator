@@ -264,6 +264,9 @@ class Projects extends CI_Controller {
             $temp = $this->projects_model->select_project_by_id($project_id)->result();
             $project = $temp[0];
 
+            //Delete final video if it has
+            $this->projects_model->delete_final_video($project->id, $project->video_id);
+
             //Delete youtube video
             $this->youtube_model->delete_youtube_video($project->video_id);
 
@@ -520,8 +523,8 @@ class Projects extends CI_Controller {
             $project_id = $temp[0];
         else
             echo json_encode(array('return_result' => false));
-        $temp1 = $this->projects_model->get_project_by_params($project_id, get_session_user_id(), null, null, null, "Finished");
-        $project = $temp1;
+        $temp1 = $this->projects_model->get_project_by_params($project_id, null, null, null, null, "Finished");
+        $project = $temp1[0];
         $this->session->set_flashdata('message_type', 'error');
         if($project)
         {
