@@ -58,13 +58,13 @@ INSTALLATION
     translator  |   password
 
 
-- Open .htaccess in line 3 and make sure this is the correct path where you uploaded
-  the platform.
+- Open .htaccess in line 3 and make sure this is the correct path where you 
+  uploaded the platform.
 
-- Open config.php, soundcloud_config.php, youtube_config.php, database.php and update
-  each line according to your needs.
-  Note that you have to create a Soundcloud and Youtube account. And for both of them
-  you have to create an app.
+- Open config.php, soundcloud_config.php, youtube_config.php, database.php and
+  update  each line according to your needs.
+  Note that you have to create a Soundcloud and Youtube account. And for both 
+  of them you have to create an app.
 
   - For Youtube please follow this link:
   URL: https://code.google.com/apis/youtube/dashboard/gwt/index.html
