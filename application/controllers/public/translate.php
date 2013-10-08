@@ -53,8 +53,9 @@ class Translate extends CI_Controller {
             $data['task_id'] = $task_id;
             $data['hash'] = $project->hash_tags;
             $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project_id)->result();
-//            $data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
-            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            //$data['next_tasks'] = $result;print_r($data['next_tasks']);exit;
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['captcha'] = get_captcha_image();
             $this->load->view("public/public_translate", $data);
         }
         else
@@ -97,7 +98,8 @@ class Translate extends CI_Controller {
             //$data['access_token'] = $token;
             $data['client_id'] = $this->config->item("soundcloud_client_id");
             $data['redirect_url'] = $this->config->item("soundcloud_redirect_url");
-            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['captcha'] = get_captcha_image();
             $this->load->view("public/public_audio", $data);
         }
         else
@@ -111,13 +113,18 @@ class Translate extends CI_Controller {
     function validate_audio_captcha()
     {
         //reCaptcha Validation
-        $this->load->library("recaptcha");
+        /*$this->load->library("recaptcha");
         $this->recaptcha->recaptcha_check_answer(
             $_SERVER['REMOTE_ADDR'],
             $this->input->post('recaptcha_challenge_field'),
             $this->input->post('recaptcha_response_field')
-        );
-        $data['return_result'] = $this->recaptcha->is_valid;
+        );*/
+        $result = false;
+        if($this->input->post('captcha_code') == $this->session->userdata('captcha_word'))
+        {
+            $result = true;
+        }
+        $data['return_result'] = $result;
         echo json_encode($data);
     }
 

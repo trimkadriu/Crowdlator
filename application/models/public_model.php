@@ -25,12 +25,18 @@ class Public_model extends CI_Model {
                 redirect(base_url());
             }
             //reCaptcha Validation
-            $this->recaptcha->recaptcha_check_answer(
+            /*$this->recaptcha->recaptcha_check_answer(
                 $_SERVER['REMOTE_ADDR'],
                 $this->input->post('recaptcha_challenge_field'),
                 $this->input->post('recaptcha_response_field')
             );
             if(!$this->recaptcha->is_valid)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                redirect("public/translate/task/".$task_id);
+            }*/
+            if($this->input->post('captcha_code') != $this->session->userdata('captcha_word'))
             {
                 $this->session->set_flashdata('message_type', 'error');
                 $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');

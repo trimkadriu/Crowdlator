@@ -50,7 +50,8 @@ class Vote extends CI_Controller {
             $data['project_description'] = $project->project_description;
             $data['hash'] = $project->hash_tags;
             $data['next_tasks'] = $this->tasks_model->get_tasks_by_project_id($project->id)->result();
-            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['captcha'] = get_captcha_image();
             $data['translation_type'] = "text";
             $this->load->view("public/public_vote", $data);
         }
@@ -89,7 +90,8 @@ class Vote extends CI_Controller {
             $data['project_video_id'] = $project->video_id;
             $data['project_description'] = $project->project_description;
             $data['hash'] = $project->hash_tags;
-            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['captcha'] = get_captcha_image();
             $data['translation_type'] = "audio";
             $this->load->view("public/public_vote_audio", $data);
         }

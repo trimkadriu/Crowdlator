@@ -56,13 +56,19 @@ class Translate extends CI_Controller {
                 redirect("admin/projects/list_projects");
             }
             //reCaptcha Validation
-            $this->load->library("recaptcha");
+            /*$this->load->library("recaptcha");
             $this->recaptcha->recaptcha_check_answer(
                 $_SERVER['REMOTE_ADDR'],
                 $this->input->post('recaptcha_challenge_field'),
                 $this->input->post('recaptcha_response_field')
             );
             if(!$this->recaptcha->is_valid)
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                redirect("admin/translate/task_id/".$task_id);
+            }*/
+            if($this->input->post('captcha_code') != $this->session->userdata('captcha_word'))
             {
                 $this->session->set_flashdata('message_type', 'error');
                 $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
@@ -122,7 +128,8 @@ class Translate extends CI_Controller {
             $data['translate_to'] = $project->translate_to_language;
             $data['text'] = $task->text;
             $data['task_id'] = $task_id;
-            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['captcha'] = get_captcha_image();
             $this->load->view("admin/projects/translate", $data);
         }
         else
@@ -540,13 +547,25 @@ class Translate extends CI_Controller {
                     {
                         //Public Vote
                         //reCaptcha Validation
-                        $this->load->library("recaptcha");
+                        /*$this->load->library("recaptcha");
                         $this->recaptcha->recaptcha_check_answer(
                             $_SERVER['REMOTE_ADDR'],
                             $this->input->post('recaptcha_challenge_field'),
                             $this->input->post('recaptcha_response_field')
                         );
                         if(!$this->recaptcha->is_valid)
+                        {
+                            $this->session->set_flashdata('message_type', 'error');
+                            $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                            if($translation_type == "audio")
+                            {
+                                $temp3 = $this->audios_model->get_audios($translation_id, null, null, null, null);
+                                $translation_id = $temp3[0];
+                                $translation_id = $translation_id->project_id;
+                            }
+                            redirect("public/vote/".$return_url."/".$translation_id);
+                        }*/
+                        if($this->input->post('captcha_code') != $this->session->userdata('captcha_word'))
                         {
                             $this->session->set_flashdata('message_type', 'error');
                             $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
@@ -677,7 +696,7 @@ class Translate extends CI_Controller {
                 $this->session->set_flashdata('message', 'This task belongs to a project which is not in translation stage.');
                 redirect("admin/translate/draft_list");
             }
-            //reCaptcha Validation
+            /*//reCaptcha Validation
             $this->load->library("recaptcha");
             $this->recaptcha->recaptcha_check_answer(
                 $_SERVER['REMOTE_ADDR'],
@@ -689,6 +708,12 @@ class Translate extends CI_Controller {
                 $this->session->set_flashdata('message_type', 'error');
                 $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
                 redirect("admin/translate/task_id/".$task_id);
+            }*/
+            if($this->input->post('captcha_code') != $this->session->userdata('captcha_word'))
+            {
+                $this->session->set_flashdata('message_type', 'error');
+                $this->session->set_flashdata('message', 'Captcha code is incorrect. Please try again');
+                redirect("admin/translate/draft_list");
             }
             $draft_text = strip_tags($this->input->post("translated", true));
             if($draft_id != null)
@@ -735,7 +760,8 @@ class Translate extends CI_Controller {
             $data['translate_to'] = $project->translate_to_language;
             $data['text'] = $task->text;
             $data['task_id'] = $task_id;
-            $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+            $data['captcha'] = get_captcha_image();
             $data['draft_text'] = $draft->draft_text;
             $data['draft_id'] = $draft_id;
             $this->load->view("admin/projects/translate", $data);
@@ -1008,7 +1034,8 @@ class Translate extends CI_Controller {
         //$data['access_token'] = $token;
         $data['client_id'] = $this->config->item("soundcloud_client_id");
         $data['redirect_url'] = $this->config->item("soundcloud_redirect_url");
-        $data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+        //$data['recaptcha_public_key'] = $this->config->item("recaptcha_public_key");
+        $data['captcha'] = get_captcha_image();
         $this->load->view("admin/audios/audio_audition", $data);
     }
 

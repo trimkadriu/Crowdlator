@@ -135,9 +135,12 @@ function get_if_voted_by_id_type($id, $type)
     }
 }
 
-function generateRandomString($length = 10)
+function generateRandomString($length = 10, $number_only = false)
 {
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if($number_only)
+        $characters = '0123456789';
+    else
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomString = '';
     for ($i = 0; $i < $length; $i++) {
         $randomString .= $characters[rand(0, strlen($characters) - 1)];
@@ -173,6 +176,17 @@ function check_project_status($project_id)
     if($success == sizeof($tasks))
         $status = true;
     return $status;
+}
+
+function get_captcha_image()
+{
+    $CI =& get_instance();
+    $CI->load->helper('captcha');
+    $cap_conf = $CI->config->item("captcha_config");
+    $cap_conf['word'] = generateRandomString(6, true);
+    $cap = create_captcha($cap_conf);
+    $CI->session->set_userdata('captcha_word', $cap['word']);
+    return $cap['image'];
 }
 
 function get_html_country_dropdown_list()
