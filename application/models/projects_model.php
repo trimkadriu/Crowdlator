@@ -241,7 +241,8 @@ class Projects_model extends CI_Model {
         $ds = DIRECTORY_SEPARATOR;
         $videos_location = dirname(__FILE__).$ds.'..'.$ds.'..'.$ds.'final_videos'.$ds;
         $video_filename = $project_id."_".$video_id.".mp4";
-        unlink($videos_location.$video_filename);
+        if (file_exists($videos_location.$video_filename))
+            unlink($videos_location.$video_filename);
     }
 }
 

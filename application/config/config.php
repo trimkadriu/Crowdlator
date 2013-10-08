@@ -422,6 +422,38 @@ $config['terms_conditions'] = 'To be provided soon...';
 
 /*
 |--------------------------------------------------------------------------
+| Captcha configurations
+|--------------------------------------------------------------------------
+|
+| Captcha variables and configurations
+|
+*/
+$config['captcha_config'] = array(
+    'img_path'	 => './captcha/',
+    'img_url'	 => 'http://localhost/crowdlator/captcha/',
+    'img_width'	 => '120',
+    'img_height' => 30,
+    'border'     => 1,
+    'expiration' => 7200 //Seconds
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENABLE TEST CONTROLLER
+|--------------------------------------------------------------------------
+|
+| Test controller is usable only while debugging the application.
+| Please do not enable it while application is in public use because it can
+| reveal sensitive information.
+| value true or false
+|
+*/
+$config['test_controller'] = false;
+
+
+/*
+|--------------------------------------------------------------------------
 | Other Application Settings
 |--------------------------------------------------------------------------
 |

@@ -8,20 +8,25 @@
         <strong>Translated from <?php echo $translate_from; ?> to <?php echo $translate_to; ?>:</strong><br/>
         <textarea disabled="disabled" class="translate_text"><?php echo $translated_text; ?></textarea><br/><br/>
         <!-- reCaptcha CODE -->
-        <script type="text/javascript">
+        <!--<script type="text/javascript">
             var RecaptchaOptions = {theme : 'clean'};
         </script>
         <div style="margin-bottom: 15px;">
-            <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=<?php echo $recaptcha_public_key; ?>">
+            <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=<?php /*echo $recaptcha_public_key; */?>">
             </script>
             <noscript>
-                <iframe src="http://www.google.com/recaptcha/api/noscript?k=<?php echo $recaptcha_public_key; ?>"
+                <iframe src="http://www.google.com/recaptcha/api/noscript?k=<?php /*echo $recaptcha_public_key; */?>"
                         height="200" width="500" frameborder="0"></iframe><br>
                 <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
                 <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
             </noscript>
-        </div>
+        </div>-->
         <!-- reCaptcha CODE -->
+        <div style="margin: 10px 0 15px 0;">
+            <strong>Captcha code:</strong><br/>
+            <input type="text" name="captcha_code" style="margin-top: 10px; width: 120px;" required>
+            <?php echo $captcha; ?>
+        </div>
         <strong>Record audio in <?php echo $translate_to; ?>:</strong><br/>
         <input type="hidden" name="project_id" value="<?php echo $project_id; ?>"/>
         <span class="ctrl-btn-container" style="margin: 0 0 20px 0; width: 95%;">
@@ -165,8 +170,7 @@
             $("#reset_audio").hide();
             $.post(
                 "<?php echo base_url("public/translate/validate_audio_captcha"); ?>", {
-                    recaptcha_challenge_field: $("#recaptcha_challenge_field").val(),
-                    recaptcha_response_field: $("#recaptcha_response_field").val()
+                    captcha_code: $("input[name=captcha_code]").val()
                 },
                 function(data){
                     var obj = $.parseJSON(data);
@@ -176,7 +180,7 @@
                         soundcloud_upload();
                     }
                     else if(obj.return_result == false) {
-                        Recaptcha.reload();
+                        //Recaptcha.reload();
                         $("#reset_audio").show();
                         $("#upload_button").text("Upload Audio").removeAttr("disabled");
                         $("#error_message").modal("show");
