@@ -237,6 +237,22 @@ class Projects_model extends CI_Model {
             return false;
     }
 
+    function set_final_video_id($project_id, $video_id)
+    {
+        $this->db->trans_start();
+        $data = array(
+            'final_video_id' => $video_id
+        );
+        $this->db->where('id', $project_id);
+        $this->db->update('projects', $data);
+        $this->db->trans_complete();
+        $log = $this->db->last_query();
+        if($this->db->trans_status() === TRUE)
+            return true;
+        else
+            return false;
+    }
+
     function delete_final_video($project_id, $video_id) {
         $ds = DIRECTORY_SEPARATOR;
         $videos_location = dirname(__FILE__).$ds.'..'.$ds.'..'.$ds.'final_videos'.$ds;

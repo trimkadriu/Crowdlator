@@ -9,32 +9,25 @@ class Test extends CI_Controller {
             redirect(base_url());
     }
 
-    function index() {
+    function index()
+    {
         echo '<h3>Test</h3>'.
              '<a href="'.base_url().'/test/video">Video</a><br/>'.
-             '<a href="'.base_url().'/test/audio">Audio</a><br/>'.
-             '<a href="'.base_url().'/test/finalvideo">Final video<br/>';
+             '<a href="'.base_url().'/test/audio">Audio</a><br/>';
     }
 
-    function video() {
+    function video()
+    {
+        echo 'Should return the Youtube TOKEN (a long string)<br/><br/>';
         $this->load->model("youtube_model");
         echo $this->youtube_model->do_login();
     }
 
-    function audio() {
+    function audio()
+    {
+        echo 'Should return the SoundCloud TOKEN (a short string)<br/><br/>';
         $this->load->model("soundcloud_model");
         print_r($this->soundcloud_model->get_access_token());
-    }
-
-    function finalvideo() {
-        $this->load->model("ffmpeg_model");
-        $this->ffmpeg_model->generate_video('19', 'AqCJmD2rwLc', '109421575');
-    }
-
-    function deletefinal() {
-        $this->load->model("projects_model");
-        $this->projects_model->delete_final_video('19','AqCJmD2rwLc');
-        echo 'done';
     }
 
 }

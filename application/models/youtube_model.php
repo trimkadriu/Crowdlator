@@ -172,6 +172,58 @@ class Youtube_model extends CI_Model {
         return false;
     }
 
+    function upload_direct_video($project_id, $video_id, $title, $description, $tags)
+    {
+        $videos_location = $this->application_location.'..'.$this->ds.'final_videos'.$this->ds;
+        $filename = $project_id.'_'.$video_id.'.mp4';
+        $video_path = $videos_location.$filename;
+        if(!file_exists($video_path))
+            return false;
+        //Get youtube video upload token
+        $login_response = $this->do_login();
+        //Load configuration variables
+        $youtube_user_id = $this->config->item("youtube_user_id");
+        $youtube_developer_key = $this->config->item("youtube_developer_key");
+        list($auth, $youtubeuser) = explode("\n", $login_response);
+        list($authlabel, $authvalue) = array_map("trim", explode("=", $auth));
+        $data = '<?xml version="1.0"?>
+                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                <entry xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:yt="http://gdata.youtube.com/schemas/2007">
+                    <media:group>
+                        <media:title type="plain">' . $title . '</media:title>
+                        <media:description type="plain">' . trim($description) . '</media:description>
+                        <media:keywords>' . $tags . '</media:keywords>
+                        <media:category scheme="http://gdata.youtube.com/schemas/2007/categories.cat">Music</media:category>
+                    </media:group>
+                </entry>';
+        $headers = array(
+            'Authorization: GoogleLogin auth=' . $authvalue,
+            'GData-Version: 2',
+            'X-GData-Key: key='.$youtube_developer_key,
+            'Slug: ' . basename($video_path)
+        );
+
+        $tmpfname = tempnam("/tmp", "youtube");
+        $handle = fopen($tmpfname, "w");
+        fwrite($handle, $data);
+        fclose($handle);
+
+        $post = array(
+            'xml' => '@' . $tmpfname . ";type=application/atom+xml",
+            'video' => '@' . $video_path . ";type=video/mp4",
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "uploads.gdata.youtube.com/feeds/api/users/default/uploads");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $content = curl_exec($ch);
+        curl_close($ch);
+        $object = simplexml_load_string($content);
+        return substr($object->id, strrpos($object->id, ':') + 1);
+    }
+
 }
 
 ?>

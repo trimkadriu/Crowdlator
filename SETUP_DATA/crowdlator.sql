@@ -109,7 +109,8 @@ INSERT INTO `permissions` (`id`, `permission`) VALUES
 (32, 'admin/translate/my_audios'),
 (33, 'admin/translate/choose_audio'),
 (34, 'admin/projects/generate_video'),
-(35, 'admin/projects/generate_download_video_link');
+(35, 'admin/projects/generate_download_video_link'),
+(36, 'admin/projects/upload_final_video');
 
 -- --------------------------------------------------------
 
@@ -131,12 +132,12 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `translated_text` longtext CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   `hash_tags` varchar(50) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   `video_id` varchar(15) DEFAULT NULL,
+  `final_video_id` varchar(15) DEFAULT NULL,
   `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` varchar(32) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
-  KEY `admin_id` (`admin_id`),
-  KEY `admin_id_2` (`admin_id`)
+  KEY `admin_id` (`admin_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
 -- --------------------------------------------------------
@@ -230,7 +231,9 @@ INSERT INTO `roles_x_permissions` (`id_role`, `id_permission`) VALUES
 (1, 34),
 (1, 35),
 (4, 34),
-(4, 35);
+(4, 35),
+(1, 36),
+(4, 36);
 
 -- --------------------------------------------------------
 
