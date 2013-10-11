@@ -269,6 +269,7 @@ class Projects extends CI_Controller {
 
             //Delete youtube video
             $this->youtube_model->delete_youtube_video($project->video_id);
+            $this->youtube_model->delete_youtube_video($project->final_video_id);
 
             //Delete all audios
             $audios = $this->audios_model->get_audios(null, $project->id, null, null, null, null);
@@ -583,6 +584,39 @@ class Projects extends CI_Controller {
         $data = file_get_contents($final_location.$video_filename);
         $name = 'final_video_'.generateRandomString(5).'.mp4';
         force_download($name, $data);
+    }
+
+    public function upload_final_video()
+    {
+        if(!check_permissions(get_session_roleid(), 'admin/projects/upload_final_video'))
+            echo json_encode(array('return_result' => false));
+        $temp = func_get_args(0);
+        if($temp)
+            $project_id = $temp[0];
+        else
+            echo json_encode(array('return_result' => false));
+        $temp1 = $this->projects_model->get_project_by_params($project_id, null, null, null, null, "Finished");
+        $project = $temp1[0];
+        if($project->final_video_id == null || $project->final_video_id == '')
+        {
+            if($project)
+            {
+                $final_video_id = $this->youtube_model->upload_direct_video($project->id, $project->video_id, $project->project_name.' [TRANSLATED]',
+                                    $project->project_description, $this->config->item('youtube_keywords'));
+                if($final_video_id) {
+                    $this->projects_model->set_final_video_id($project->id, $final_video_id);
+                    $json_result = array('return_result' => true, 'final_video_id' => $final_video_id);
+                    echo json_encode($json_result);
+                }
+            }
+            else
+                echo json_encode(array('return_result' => false));
+        }
+        else
+        {
+            $json_result = array('return_result' => true, 'final_video_id' => $project->final_video_id);
+            echo json_encode($json_result);
+        }
     }
 
     public function delete_task()

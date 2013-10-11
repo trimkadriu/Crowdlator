@@ -138,16 +138,22 @@
         <h3>Generate final video</h3>
     </div>
     <div class="modal-body">
-        <p class="">Please don't close this window while generating video is in progress.</p>
+        <p class="">Please don't close this window while generating video is in progress (this may take some time).</p>
         <div class="progress progress-striped active" id="generate_video_progress" style="display: none;">
             <div class="bar" style="width: 100%;">Generating video, please wait...</div>
+        </div>
+        <div id="final_video_youtube" class="hide">
+            <iframe width="500" height="280" frameborder="0" allowfullscreen="" src=""></iframe>
+            <strong>Youtube Link:</strong><br/>
+            <input type="text" readonly style="width:90%">
         </div>
         <input type="hidden" id="generate_video_project_id">
         <input type="hidden" id="generate_video_video_id">
     </div>
     <div class="modal-footer">
         <a class="btn" data-dismiss="modal">Cancel</a>
-        <a class="btn btn-primary" id="generate_video">Generate Video</a>
+        <a class="btn btn-success" id="upload_youtube">Upload in YouTube</a>
+        <a class="btn btn-success" id="generate_video">Download Video</a>
     </div>
 </div>
 <style>
@@ -160,8 +166,33 @@
     $(document).ready(function () {
         $("[rel=tooltip]").tooltip();
 
+        $('#upload_youtube').click(function () {
+            $(this).attr("disabled", "disabled");
+            $("#generate_video").attr("disabled", "disabled");
+            $("#generate_video_progress").show();
+            id = $("#generate_video_project_id").val();
+            video_id = $("#generate_video_video_id").val();
+            $.get('<?php echo base_url("admin/projects/generate_video"); ?>/' + id, function(data) {
+                var obj = $.parseJSON(data);
+                if(obj.return_result == true) {
+                    $.get('<?php echo base_url("admin/projects/upload_final_video"); ?>/' + id, function(data) {
+                        var finalVideo = $.parseJSON(data);
+                        if(finalVideo.return_result == true) {
+                            $('#final_video_youtube iframe').attr('src', 'http://www.youtube.com/embed/' + finalVideo.final_video_id);
+                            $('#final_video_youtube input').val('http://www.youtube.com/watch?v=' + finalVideo.final_video_id);
+                            $('#final_video_youtube').show();
+                            $("#generate_video_progress").hide();
+                        }
+                    });
+                }
+                else
+                    window.location.href = "<?php echo base_url('admin/projects/projects_status'); ?>";
+            });
+        });
+
         $("#generate_video").click(function () {
-            $(this).attr("disabled", "disabled")
+            $(this).attr("disabled", "disabled");
+            $("#upload_youtube").attr("disabled", "disabled");
             $("#generate_video_progress").show();
             id = $("#generate_video_project_id").val();
             video_id = $("#generate_video_video_id").val();
